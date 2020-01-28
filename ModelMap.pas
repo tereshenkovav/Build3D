@@ -17,7 +17,8 @@ type
     destructor Destroy ; override ;
     function isBlockAt(x,y,z:Integer):Boolean ;
     function getBlockAt(x,y,z:Integer; out block:TBlock):Boolean ;
-    function getCountBlocksAround6(b:TBlock):Integer ;
+    function getCountBlocksAround6(b:TBlock):Integer ; overload ;
+    function getCountBlocksAround6(x,y,z:Integer):Integer ; overload ;
     function getCountBlocksAround26(x,y,z:Integer): Integer;
   end;
 
@@ -100,15 +101,20 @@ begin
           if isBlockAt(x+i,y+j,z+k) then Inc(Result) ;
 end;
 
-function TModelMap.getCountBlocksAround6(b: TBlock): Integer;
+function TModelMap.getCountBlocksAround6(x,y,z:Integer): Integer;
 begin
   Result:=0 ;
-  if isBlockAt(b.x-1,b.y,b.z) then Inc(Result) ;
-  if isBlockAt(b.x+1,b.y,b.z) then Inc(Result) ;
-  if isBlockAt(b.x,b.y-1,b.z) then Inc(Result) ;
-  if isBlockAt(b.x,b.y+1,b.z) then Inc(Result) ;
-  if isBlockAt(b.x,b.y,b.z-1) then Inc(Result) ;
-  if isBlockAt(b.x,b.y,b.z+1) then Inc(Result) ;
+  if isBlockAt(x-1,y,z) then Inc(Result) ;
+  if isBlockAt(x+1,y,z) then Inc(Result) ;
+  if isBlockAt(x,y-1,z) then Inc(Result) ;
+  if isBlockAt(x,y+1,z) then Inc(Result) ;
+  if isBlockAt(x,y,z-1) then Inc(Result) ;
+  if isBlockAt(x,y,z+1) then Inc(Result) ;
+end;
+
+function TModelMap.getCountBlocksAround6(b: TBlock): Integer;
+begin
+  Result:=getCountBlocksAround6(b.x,b.y,b.z) ;
 end;
 
 end.

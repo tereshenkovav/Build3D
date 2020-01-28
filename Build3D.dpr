@@ -22,7 +22,8 @@ uses
   Monitor in 'Monitor.pas',
   ModelMap in 'ModelMap.pas',
   DebugClient in 'DebugClient.pas',
-  DrawToolSmooth in 'DrawToolSmooth.pas';
+  DrawToolSmooth in 'DrawToolSmooth.pas',
+  DrawToolGrow in 'DrawToolGrow.pas';
 
 {$R *.res}
 

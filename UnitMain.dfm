@@ -2,7 +2,7 @@ object FormMain: TFormMain
   Left = 0
   Top = 0
   Caption = #1058#1088#1077#1093#1084#1077#1088#1085#1099#1081' '#1088#1077#1076#1072#1082#1090#1086#1088' '#1082#1091#1073#1080#1082#1086#1074
-  ClientHeight = 594
+  ClientHeight = 647
   ClientWidth = 666
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -26,9 +26,10 @@ object FormMain: TFormMain
     Left = 488
     Top = 0
     Width = 178
-    Height = 594
+    Height = 647
     Align = alRight
     TabOrder = 0
+    ExplicitHeight = 594
     object Label1: TLabel
       Left = 16
       Top = 8
@@ -44,14 +45,14 @@ object FormMain: TFormMain
     end
     object Label2: TLabel
       Left = 6
-      Top = 260
+      Top = 324
       Width = 47
       Height = 13
       Caption = #1058#1077#1082#1089#1090#1091#1088#1072
     end
     object Label3: TLabel
       Left = 8
-      Top = 352
+      Top = 416
       Width = 63
       Height = 13
       Caption = #1063#1080#1089#1083#1086' '#1082#1091#1073#1086#1074
@@ -59,28 +60,28 @@ object FormMain: TFormMain
     end
     object Label4: TLabel
       Left = 6
-      Top = 400
+      Top = 464
       Width = 137
       Height = 13
       Caption = #1056#1072#1079#1084#1077#1088#1099' '#1087#1072#1088#1072#1083#1083#1077#1083#1077#1087#1080#1087#1077#1076#1072
     end
     object Label5: TLabel
       Left = 6
-      Top = 306
+      Top = 370
       Width = 98
       Height = 13
       Caption = #1058#1077#1082#1089#1090#1091#1088#1099' '#1074' '#1084#1086#1076#1077#1083#1080
     end
     object LabR: TLabel
       Left = 6
-      Top = 352
-      Width = 105
+      Top = 416
+      Width = 99
       Height = 13
-      Caption = #1056#1072#1076#1080#1091#1089' '#1089#1075#1083#1072#1078#1080#1074#1072#1085#1080#1103
+      Caption = #1056#1072#1076#1080#1091#1089' '#1087#1088#1080#1084#1077#1085#1077#1085#1080#1103
     end
     object comboTexs: TComboBox
       Left = 6
-      Top = 279
+      Top = 343
       Width = 163
       Height = 21
       Style = csDropDownList
@@ -88,7 +89,7 @@ object FormMain: TFormMain
     end
     object EdCubeN: TEdit
       Left = 8
-      Top = 368
+      Top = 432
       Width = 33
       Height = 21
       TabOrder = 1
@@ -97,7 +98,7 @@ object FormMain: TFormMain
     end
     object EdParX: TEdit
       Left = 6
-      Top = 416
+      Top = 480
       Width = 35
       Height = 21
       TabOrder = 2
@@ -105,7 +106,7 @@ object FormMain: TFormMain
     end
     object EdParY: TEdit
       Left = 47
-      Top = 416
+      Top = 480
       Width = 35
       Height = 21
       TabOrder = 3
@@ -113,7 +114,7 @@ object FormMain: TFormMain
     end
     object EdParZ: TEdit
       Left = 88
-      Top = 416
+      Top = 480
       Width = 35
       Height = 21
       TabOrder = 4
@@ -121,11 +122,12 @@ object FormMain: TFormMain
     end
     object Panel1: TPanel
       Left = 1
-      Top = 456
+      Top = 509
       Width = 176
       Height = 137
       Align = alBottom
       TabOrder = 5
+      ExplicitTop = 456
       object stModelSize: TStaticText
         Left = 5
         Top = 8
@@ -165,7 +167,7 @@ object FormMain: TFormMain
     end
     object ComboTexsInModel: TComboBox
       Left = 6
-      Top = 325
+      Top = 389
       Width = 163
       Height = 21
       Style = csDropDownList
@@ -177,7 +179,7 @@ object FormMain: TFormMain
     Left = 0
     Top = 0
     Width = 488
-    Height = 594
+    Height = 647
     Align = alClient
     DoubleBuffered = True
     ParentDoubleBuffered = False
@@ -185,6 +187,7 @@ object FormMain: TFormMain
     OnClick = PanelGLClick
     OnMouseMove = PanelGLMouseMove
     OnMouseUp = PanelGLMouseUp
+    ExplicitHeight = 594
   end
   object MainMenu1: TMainMenu
     OwnerDraw = True

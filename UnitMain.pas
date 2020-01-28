@@ -117,7 +117,8 @@ var
 implementation
 uses OpenGL, IOUtils,
   dglOpenGL,
-  DrawToolCubeCube,DrawToolPar,DrawToolSphere, DrawToolSmooth, UnitSizeLimit,
+  DrawToolCubeCube,DrawToolPar,DrawToolSphere, DrawToolSmooth,DrawToolGrow,
+    UnitSizeLimit,
     UnitSliceOpt, Constants, DrawToolPip, CommonProc, Monitor, Measure ;
 
 {$R *.dfm}
@@ -562,10 +563,11 @@ begin
 
   Label3.Visible:=(ActiveTool is TDrawToolCubeCube)or
   (ActiveTool is TDrawToolSphere) ;
-  LabR.Visible:=(ActiveTool is TDrawToolSmooth) ;
+  LabR.Visible:=(ActiveTool is TDrawToolSmooth)or(ActiveTool is TDrawToolGrow) ;
   EdCubeN.Visible:=(ActiveTool is TDrawToolCubeCube)or
   (ActiveTool is TDrawToolSphere) or
-  (ActiveTool is TDrawToolSmooth) ;
+  (ActiveTool is TDrawToolSmooth) or
+  (ActiveTool is TDrawToolGrow) ;
 
   Label4.Visible:=(ActiveTool is TDrawToolPar) ;
   EdParX.Visible:=(ActiveTool is TDrawToolPar) ;
