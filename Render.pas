@@ -29,6 +29,7 @@ type
      FBackColor:TColor ;
      Rebuild3DPos:Boolean ;
      CenterView:TPoint3D ;
+     rback,gback,bback:Single ;
      procedure DrawCube(block:TBlock) ;
      procedure DrawPreCube(block:TBlock) ;
      procedure SetCubePos(pos:TPoint3D) ;
@@ -40,6 +41,8 @@ type
      function block2point3d(block:TBlock):TPoint3D ;
   public
      NoSelection:Boolean ;
+     ShowBorders:Boolean ;
+     UsePlanesBright:Boolean ;
      constructor Create(Adc:HDC; Amodel:TModel) ;
      procedure SetupGL;
      function GetPosInfo():string ;
@@ -231,10 +234,15 @@ begin
   Result:=(Abs(PosZ+z-TekZ)<EPS)and(Abs(PosY-TekY)<1-EPS)and(Abs(PosX-TekX)<1-EPS) ;
 end;
 
+var POS:array[0..1] of double = (1.0,-1.0) ;
+
 procedure TRender.DrawCube(block:TBlock);
 var sel:Boolean ;
+    i1,i2:Integer ;
 begin
    sel:=False ;
+
+   if UsePlanesBright then glColor3F(0.80,0.80,0.80) ;
 
    sel:=isTekAtSideZ(1.0) ;
    glBegin(GL_QUADS);
@@ -260,6 +268,8 @@ begin
    if sel then begin FisBlockOver:=True ; OverBlock:=block; OverBlockDir:=dirZle ;
       glColor3F(1.0,1.0,1.0) ; Inc(Rcnt) ; end ;
 
+   if UsePlanesBright then glColor3F(1.0,1.0,1.0) ;
+
    sel:=isTekAtSideY(1.0)  ;
    glBegin(GL_QUADS);
     glNormal3f( 0.0, 1.0, 0.0);
@@ -284,6 +294,8 @@ begin
    if sel then begin FisBlockOver:=True ; OverBlock:=block; OverBlockDir:=dirYle;
       glColor3F(1.0,1.0,1.0) ; Inc(Rcnt) ; end ;
 
+   if UsePlanesBright then glColor3F(0.6,0.6,0.6) ;
+
    sel:=isTekAtSideX(1.0) ;
    glBegin(GL_QUADS);
     glNormal3f( 1.0, 0.0, 0.0);
@@ -307,6 +319,27 @@ begin
   glEnd();
    if sel then begin FisBlockOver:=True ; OverBlock:=block; OverBlockDir:=dirXle ;
       glColor3F(1.0,1.0,1.0) ; Inc(Rcnt) ; end ;
+
+   if ShowBorders then begin
+   glColor3d(rback,gback,bback);
+   glLineWidth(2.0);
+   for i1 := 0 to 1 do
+     for i2 := 0 to 1 do begin
+       glBegin(GL_LINES);
+       glVertex3f(-1.0, POS[i1],  POS[i2]);
+       glVertex3f( 1.0, POS[i1],  POS[i2]);
+       glEnd();
+       glBegin(GL_LINES);
+       glVertex3f(POS[i1], -1.0, POS[i2]);
+       glVertex3f(POS[i1], 1.0, POS[i2]);
+       glEnd();
+       glBegin(GL_LINES);
+       glVertex3f(POS[i1], POS[i2], -1.0);
+       glVertex3f(POS[i1], POS[i2], 1.0);
+       glEnd();
+     end;
+   glColor3d(1.0,1.0,1.0);
+   end;
 
 end;
 
@@ -438,7 +471,6 @@ var
   block:TBlock ;
   Eye,View:TPoint3D ;
   f:text ;
-  r,g,b:Single ;
 begin
   glViewport(0,0,width,height);
   glMatrixMode(GL_PROJECTION);
@@ -449,8 +481,8 @@ begin
 
   glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT);
 
-  unRGBOpenGL(BackColor,r,g,b) ;
-  glClearColor(r,g,b,1.0) ;
+  unRGBOpenGL(BackColor,rback,gback,bback) ;
+  glClearColor(rback,gback,bback,1.0) ;
 
   Eye:=GetEyePoint() ;
   View:=GetViewPoint() ;

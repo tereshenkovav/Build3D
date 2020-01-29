@@ -29,7 +29,6 @@ object FormMain: TFormMain
     Height = 647
     Align = alRight
     TabOrder = 0
-    ExplicitHeight = 594
     object Label1: TLabel
       Left = 16
       Top = 8
@@ -127,7 +126,6 @@ object FormMain: TFormMain
       Height = 137
       Align = alBottom
       TabOrder = 5
-      ExplicitTop = 456
       object stModelSize: TStaticText
         Left = 5
         Top = 8
@@ -187,7 +185,6 @@ object FormMain: TFormMain
     OnClick = PanelGLClick
     OnMouseMove = PanelGLMouseMove
     OnMouseUp = PanelGLMouseUp
-    ExplicitHeight = 594
   end
   object MainMenu1: TMainMenu
     OwnerDraw = True
@@ -243,6 +240,14 @@ object FormMain: TFormMain
       object NSetBackColor: TMenuItem
         Caption = #1062#1074#1077#1090' '#1092#1086#1085#1072
         OnClick = NSetBackColorClick
+      end
+      object NShowBorder: TMenuItem
+        Caption = #1055#1086#1082#1072#1079#1099#1074#1072#1090#1100' '#1088#1077#1073#1088#1072
+        OnClick = NShowBorderClick
+      end
+      object NBridght: TMenuItem
+        Caption = #1071#1088#1082#1086#1089#1090#1100' '#1075#1088#1072#1085#1077#1081
+        OnClick = NBridghtClick
       end
     end
     object N5: TMenuItem

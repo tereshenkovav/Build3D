@@ -55,6 +55,8 @@ type
     stFPS: TStaticText;
     NNoSelection: TMenuItem;
     LabR: TLabel;
+    NShowBorder: TMenuItem;
+    NBridght: TMenuItem;
     procedure NExitClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -85,6 +87,8 @@ type
     procedure ComboTexsInModelChange(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
     procedure NNoSelectionClick(Sender: TObject);
+    procedure NShowBorderClick(Sender: TObject);
+    procedure NBridghtClick(Sender: TObject);
   private
      dc : HDC; //контекст устройства
      hRC : HGLRC; //контекст рендеринга
@@ -347,6 +351,12 @@ begin
   ShowMessage(model.buildBlockReport()) ;
 end;
 
+procedure TFormMain.NBridghtClick(Sender: TObject);
+begin
+  NBridght.Checked:=not NBridght.Checked ;
+  render.UsePlanesBright:=NBridght.Checked ;
+end;
+
 procedure TFormMain.NDecartClick(Sender: TObject);
 begin
   render.SwitchToDecart() ;
@@ -424,6 +434,12 @@ begin
     model.setLimits(fm.getLimits());
     UpdateInfo() ;
   end;
+end;
+
+procedure TFormMain.NShowBorderClick(Sender: TObject);
+begin
+  NShowBorder.Checked:=not NShowBorder.Checked ;
+  render.ShowBorders:=NShowBorder.Checked ;
 end;
 
 procedure TFormMain.NSliceClick(Sender: TObject);
