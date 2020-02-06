@@ -57,6 +57,7 @@ type
     LabR: TLabel;
     NShowBorder: TMenuItem;
     NBridght: TMenuItem;
+    NRedo: TMenuItem;
     procedure NExitClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -89,6 +90,7 @@ type
     procedure NNoSelectionClick(Sender: TObject);
     procedure NShowBorderClick(Sender: TObject);
     procedure NBridghtClick(Sender: TObject);
+    procedure NRedoClick(Sender: TObject);
   private
      dc : HDC; //контекст устройства
      hRC : HGLRC; //контекст рендеринга
@@ -123,7 +125,8 @@ uses OpenGL, IOUtils,
   dglOpenGL,
   DrawToolCubeCube,DrawToolPar,DrawToolSphere, DrawToolSmooth,DrawToolGrow,
     UnitSizeLimit,
-    UnitSliceOpt, Constants, DrawToolPip, CommonProc, Monitor, Measure ;
+    UnitSliceOpt, Constants, DrawToolPip, CommonProc, Monitor, Measure,
+    ModelExport ;
 
 {$R *.dfm}
 
@@ -398,6 +401,14 @@ begin
   render.setSelectionMode(smPreview);
 end;
 
+procedure TFormMain.NRedoClick(Sender: TObject);
+begin
+ if not model.Redo() then
+    ShowMessage('Нет отмененных действий')
+  else
+    UpdateInfo() ;
+end;
+
 procedure TFormMain.NSaveAsClick(Sender: TObject);
 begin
   doSaveDialog() ;
@@ -447,8 +458,11 @@ var fm:TFormSliceOpt ;
 begin
   fm:=TFormSliceOpt.Create(Self) ;
   if fm.ShowModal()=mrOK then begin
-    model.SaveLayers(fm.Dir(),fm.FileTpl(),fm.FormatExt(),fm.Axis(),
-      fm.ShowGrid(),fm.ShowPriorLayer(),fm.GridWidth(),fm.LayerBr()) ;
+    with TModelExport.Create(model) do begin
+      SaveLayers(fm.Dir(),fm.FileTpl(),fm.FormatExt(),fm.Axis(),
+        fm.ShowGrid(),fm.ShowPriorLayer(),fm.GridWidth(),fm.LayerBr()) ;
+      Free ;
+    end;
     ShowMessage('Нарезка выполнена') ;
   end;
 end;
@@ -460,7 +474,7 @@ end;
 
 procedure TFormMain.NUndoClick(Sender: TObject);
 begin
-  if not model.PopBlocks() then
+  if not model.Undo() then
     ShowMessage('Нет сохраненных изменений')
   else
     UpdateInfo() ;

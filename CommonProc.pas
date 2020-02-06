@@ -1,7 +1,10 @@
 unit CommonProc;
 
 interface
-uses Graphics, CommonClasses ;
+uses CommonClasses ;
+
+type
+TColor = -$7FFFFFFF-1..$7FFFFFFF;
 
 function getGrayColor(C:TColor; level:Integer):TColor ;
 procedure unRGBOpenGL(C:TColor; var oglR,oglG,oglB:Single) ;

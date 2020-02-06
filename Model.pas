@@ -9,10 +9,10 @@ type
   private
      blocks:TList<TBlock> ;
      history:TList<TPackedBlocks> ;
+     history_head:Integer ;
      limits:TPoint3I ;
      skipped_gids:TDictionary<String,Boolean> ;
      function findBlock(x,y,z:Integer; out block:TBlock):Boolean ;
-     function findVisibleBlock(x,y,z:Integer; out block:TBlock):Boolean ;
   public
      class function newBlock(x,y,z:Integer; texcode:string):TBlock ;
      constructor Create() ;
@@ -28,10 +28,9 @@ type
      function isLimitOver():Boolean ;
      procedure Clear() ;
      function IsEmpty():Boolean ;
-     procedure SaveLayers(Dir:string; FileTpl:string; FormatExt:string; axis:TAxis;
-       showgrid:Boolean; showpriorlayer:Boolean; gridwidth:Integer; layerbr:Integer) ;
      procedure PushBlocks() ;
-     function PopBlocks():Boolean ;
+     function Undo():Boolean ;
+     function Redo():Boolean ;
      function buildBlockReport():string ;
      procedure RebuildSkippedBlocks() ;
      function isBlockSkiped(const b:TBlock):Boolean ;
@@ -41,9 +40,9 @@ type
 procedure UpdateXYZByDir(dir:TBlockDir; var x:Integer; var y:Integer; var z:Integer) ;
 
 implementation
-uses SysUtils, Graphics, Jpeg, pngimage, Types, Clipbrd,
+uses SysUtils, Types,
   OmniXML,
-  BlockListHelper, Constants, CommonProc, Measure ;
+  BlockListHelper, Constants, CommonProc, Measure, DebugClient ;
 
 procedure UpdateXYZByDir(dir:TBlockDir; var x:Integer; var y:Integer; var z:Integer) ;
 begin
@@ -97,6 +96,7 @@ constructor TModel.Create;
 begin
   blocks:=TList<TBlock>.Create() ;
   history:=TList<TPackedBlocks>.Create() ;
+  history_head:=0 ;
   skipped_gids:=TDictionary<String,Boolean>.Create() ;
   limits.x:=100 ;
   limits.y:=100 ;
@@ -125,19 +125,45 @@ begin
   Result.texcode:=texcode ;
 end;
 
-function TModel.PopBlocks:Boolean ;
+function TModel.Undo:Boolean ;
 var i:Integer ;
+    rec:TPackedBlocks ;
 begin
-  if history.Count=0 then begin
-    Result:=False ;
-    Exit ;
+  if history_head<=0 then Exit(False) ;
+
+  DebugClient.WriteToServer('TModel.Undo',
+    Format('history_head=%d, history.Count=%d',[history_head,history.Count])) ;
+
+  if history_head=history.Count then begin
+    SetLength(rec,blocks.Count) ;
+    for i:=0 to blocks.Count-1 do
+      rec[i]:=blocks[i] ;
+    history.Add(rec) ;
   end;
 
-  blocks.Clear() ;
-  for i := 0 to Length(history.Last)-1 do
-    blocks.Add(history.Last[i]) ;
+  Dec(history_head) ;
 
-  history.Delete(history.Count-1);
+  blocks.Clear() ;
+  for i := 0 to Length(history[history_head])-1 do
+    blocks.Add(history[history_head][i]) ;
+
+  RebuildSkippedBlocks() ;
+
+  Result:=True ;
+end;
+
+function TModel.Redo:Boolean ;
+var i:Integer ;
+begin
+  if history_head+1>=history.Count then Exit(False) ;
+
+  DebugClient.WriteToServer('TModel.Redo',
+    Format('history_head=%d, history.Count=%d',[history_head,history.Count])) ;
+
+  Inc(history_head) ;
+  blocks.Clear() ;
+  for i := 0 to Length(history[history_head])-1 do
+    blocks.Add(history[history_head][i]) ;
 
   RebuildSkippedBlocks() ;
 
@@ -148,13 +174,17 @@ procedure TModel.PushBlocks;
 var rec:TPackedBlocks ;
     i:Integer ;
 begin
-  while history.Count>MAX_HISTORY_SIZE do
-    history.Delete(0) ;
+  while history.Count>history_head do
+    history.Delete(history.Count-1) ;
 
   SetLength(rec,blocks.Count) ;
   for i:=0 to blocks.Count-1 do
     rec[i]:=blocks[i] ;
   history.Add(rec) ;
+
+  if history.Count=MAX_HISTORY_SIZE then history.Delete(0) ;
+
+  history_head:=history.Count ;
 end;
 
 procedure TModel.RebuildSkippedBlocks;
@@ -179,17 +209,6 @@ begin
   begin
     Result:=(b.x=x)and(b.y=y)and(b.z=z) ;
   end, block) ;
-end;
-
-function TModel.findVisibleBlock(x, y, z: Integer; out block: TBlock): Boolean;
-begin
-  Result:=blocks.Find(function(b:TBlock):Boolean
-  begin
-    Result:=(b.x=x)and(b.y=y)and(b.z=z) ;
-  end, block) ;
-
-  if Result then
-    if skipped_gids.ContainsKey(block.gid) then Result:=False ;
 end;
 
 procedure TModel.DeleteBlock(x,y,z:Integer) ;
@@ -237,124 +256,6 @@ begin
   if blocks.Max(getZ)-blocks.Min(getZ)+1>limits.z then Result:=True ;
 end;
 
-procedure TModel.SaveLayers(Dir, FileTpl, FormatExt: string; axis: TAxis;
-  showgrid:Boolean; showpriorlayer:Boolean; gridwidth:Integer; layerbr:Integer);
-var p,p1,p2:Integer ;
-    y,z,y1,y2,z1,z2,w,h:Integer ;
-    i,j:Integer ;
-    bmp:TBitmap ;
-    Texs,TexsGray:TDictionary<string,TGraphic> ;
-    code:string ;
-    b:TBlock ;
-    gra:TGraphic ;
-    blockrect:TRect ;
-const
-  SIZE=50 ;
-
-function getCachedTex(code:string):TGraphic ;
-var tex:TGraphic ;
-begin
-  if not texs.ContainsKey(code) then begin
-    tex:=TJpegImage.Create() ;
-    tex.LoadFromFile(TEXDIR+'\'+code);
-    texs.Add(code,tex);
-  end;
-  Result:=texs[code] ;
-end;
-
-function getCachedTexGray(code:string; level:Integer):TGraphic ;
-var tex:TGraphic ;
-    bmp:TBitmap ;
-    i,j:Integer ;
-begin
-  if not texsgray.ContainsKey(code) then begin
-    tex:=TJpegImage.Create() ;
-    tex.LoadFromFile(TEXDIR+'\'+code);
-    bmp:=TBitmap.Create() ;
-    bmp.Assign(tex);
-    tex.Free ;
-
-    // gray
-    for i:=0 to bmp.Width-1 do
-      for j:=0 to bmp.Height-1 do
-        bmp.Canvas.Pixels[i,j]:=getGrayColor(bmp.Canvas.Pixels[i,j],level) ;
-
-    texsgray.Add(code,bmp);
-  end;
-  Result:=texsgray[code] ;
-end;
-
-begin
-  if isEmpty() then Exit ;
-
-  Texs:=TDictionary<string,TGraphic>.Create() ;
-  TexsGray:=TDictionary<string,TGraphic>.Create() ;
-
-  RebuildSkippedBlocks() ;
-
-    y1:=blocks.Min(getY) ;
-    y2:=blocks.Max(getY) ;
-    z1:=blocks.Min(getZ) ;
-    z2:=blocks.Max(getZ) ;
-
-  p1:=blocks.Min(getX) ;
-  p2:=blocks.Max(getX) ;
-  for p := p1 to p2 do begin
-
-    w:=SIZE*(z2-z1+1) ;
-    h:=SIZE*(y2-y1+1) ;
-    bmp:=TBitmap.Create() ;
-    bmp.Height:=h ;
-    bmp.Width:=w ;
-    bmp.Canvas.Brush.Color:=clBlack ;
-    bmp.Canvas.FillRect(Rect(0,0,w,h));
-    bmp.Canvas.Pen.Color:=clGreen ;
-    bmp.Canvas.Brush.Color:=clGreen ;
-    bmp.Canvas.Pen.Width:=3 ;
-    i:=y2-y1 ;
-    for y := y1 to y2 do begin
-      j:=0 ;
-      for z := z1 to z2 do begin
-        blockrect:=Rect(j*SIZE,i*SIZE,j*SIZE+SIZE-1,i*SIZE+SIZE-1) ;
-        if showpriorlayer then
-          if findVisibleBlock(p-1,y,z,b) then
-            bmp.Canvas.StretchDraw(blockrect,getCachedTexGray(b.texcode,layerbr));
-        if findVisibleBlock(p,y,z,b) then
-          bmp.Canvas.StretchDraw(blockrect,getCachedTex(b.texcode));
-        Inc(j) ;
-      end;
-      Dec(i) ;
-    end;
-
-    // сетка
-    if showgrid then begin
-      bmp.Canvas.Pen.Width:=gridwidth ;
-      bmp.Canvas.Pen.Color:=clWhite ;
-      for i := 1 to y2-y1 do begin
-        bmp.Canvas.MoveTo(0,i*SIZE);
-        bmp.Canvas.LineTo(w-1,i*SIZE);
-      end;
-
-      for j := 1 to z2-z1 do begin
-        bmp.Canvas.MoveTo(j*SIZE,0);
-        bmp.Canvas.LineTo(j*SIZE,h);
-      end;
-    end;
-
-    if FormatExt='bmp' then
-      bmp.SaveToFile(Dir+'\'+Format(FileTpl,[p-p1])+'.'+FormatExt)
-    else begin
-      if (FormatExt='jpg') then gra:=TJPEGImage.Create else gra:=TPNGImage.Create ;
-      gra.Assign(bmp);
-      gra.SaveToFile(Dir+'\'+Format(FileTpl,[p-p1])+'.'+FormatExt);
-      gra.Free ;
-    end;
-    bmp.Free ;
-  end;
-
-  Texs.Free ;
-end;
-
 procedure TModel.SaveToFile(FileName: string);
 var XML: IXMLDocument;
     b:TBlock ;
@@ -399,7 +300,7 @@ begin
       Result:=lrUnknownTextures ;
       if notfoundlist.IndexOf(b.texcode)=-1 then notfoundlist.Add(b.texcode) ;
     end;
-  end;
+    end;
 
   if Result=lrUnknownTextures then
     errmsg:='Не найдены текстуры :'#13#10+notfoundlist.Text ;
@@ -413,6 +314,9 @@ begin
 
   notfoundlist.Free ;
   RebuildSkippedBlocks() ;
+
+  history_head:=0 ;
+  history.Clear() ;
 end;
 
 end.

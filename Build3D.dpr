@@ -23,7 +23,8 @@ uses
   ModelMap in 'ModelMap.pas',
   DebugClient in 'DebugClient.pas',
   DrawToolSmooth in 'DrawToolSmooth.pas',
-  DrawToolGrow in 'DrawToolGrow.pas';
+  DrawToolGrow in 'DrawToolGrow.pas',
+  ModelExport in 'ModelExport.pas';
 
 {$R *.res}
 

@@ -4,7 +4,7 @@ interface
 
 const
       DEFAULTEXT = '.model' ;
-      MAX_HISTORY_SIZE = 256 ;
+      MAX_HISTORY_SIZE = 32 ;
 
 var TEXDIR:string ;
 
