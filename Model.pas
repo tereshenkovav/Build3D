@@ -14,13 +14,14 @@ type
      skipped_gids:TDictionary<String,Boolean> ;
      function findBlock(x,y,z:Integer; out block:TBlock):Boolean ;
   public
-     class function newBlock(x,y,z:Integer; texcode:string):TBlock ;
+     class function newBlock(x,y,z:Integer; texcode:string; bt:TBlockType=btFull):TBlock ;
      constructor Create() ;
      destructor Destroy ; override ;
      procedure SaveToFile(FileName:string) ;
      function LoadFromFile(FileName:string; texcodes:TStringList; out errmsg:string):TLoadResult ;
      function getBlocks():TList<TBlock> ;
      procedure AddBlock(x,y,z:Integer; texcode:string; DeleteExisted:Boolean=True) ;
+     procedure AddTypedBlock(x,y,z:Integer; texcode:string; bt:TBlockType; DeleteExisted:Boolean=True) ;
      procedure DeleteBlock(x,y,z:Integer) ;
      function getSizeInfo():string ;
      procedure setLimits(v:TPoint3I) ;
@@ -61,13 +62,13 @@ end ;
 procedure TModel.AddBlock(x, y, z: Integer; texcode: string; DeleteExisted:Boolean=True);
 //var block:TBlock ;
 begin
-  if DeleteExisted then deleteBlock(x,y,z) ;
+  AddTypedBlock(x,y,z,texcode,btFull,DeleteExisted) ;
+end;
 
-//  block.x:=x ;
-//  block.y:=y ;
-//  block.z:=z ;
-//  block.texcode:=texcode ;
-  blocks.Add(newBlock(x,y,z,texcode)) ;
+procedure TModel.AddTypedBlock(x,y,z:Integer; texcode:string; bt:TBlockType; DeleteExisted:Boolean=True) ;
+begin
+  if DeleteExisted then deleteBlock(x,y,z) ;
+  blocks.Add(newBlock(x,y,z,texcode,bt)) ;
 end;
 
 function TModel.buildBlockReport: string;
@@ -114,7 +115,7 @@ begin
   Result:=blocks ;
 end;
 
-class function TModel.newBlock(x, y, z: Integer; texcode: string): TBlock;
+class function TModel.newBlock(x, y, z: Integer; texcode: string; bt:TBlockType): TBlock;
 var G:TGuid ;
 begin
   CreateGUID(G) ;
@@ -122,6 +123,7 @@ begin
   Result.x:=x ;
   Result.y:=y ;
   Result.z:=z ;
+  Result.bt:=bt ;
   Result.texcode:=texcode ;
 end;
 
@@ -267,6 +269,9 @@ begin
        AddChild('y').Text:=b.y.ToString() ;
        AddChild('z').Text:=b.z.ToString() ;
        AddChild('gid').Text:=b.gid ;
+       if b.bt=btFull then AddChild('bt').Text:='full' else
+       if b.bt=btUpper then AddChild('bt').Text:='upper' else
+       if b.bt=btLower then AddChild('bt').Text:='lower' ;
        AddChild('texcode').Text:=b.texcode
      end;
   end;
@@ -279,6 +284,7 @@ var XML: IXMLDocument;
     Node: IXMLNode ;
     b:TBlock ;
     notfoundlist:TStringList ;
+    btstr:string ;
 begin
   Result:=lrOk ;
   errmsg:='' ;
@@ -292,6 +298,12 @@ begin
     b.y:=StrToInt(Node.SelectSingleNode('y').Text) ;
     b.z:=StrToInt(Node.SelectSingleNode('z').Text) ;
     b.gid:=Node.SelectSingleNode('gid').Text ;
+    b.bt:=btFull ;
+    if Node.SelectSingleNode('bt')<>nil then begin
+      btstr:=Node.SelectSingleNode('bt').Text ;
+      if btstr='uppper' then b.bt:=btUpper else
+      if btstr='lower' then b.bt:=btLower ;
+    end;
     b.texcode:=Node.SelectSingleNode('texcode').Text.ToLower ;
 //    code:=code.ToLower() ;
     if texcodes.IndexOf(b.texcode)<>-1 then

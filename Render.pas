@@ -30,6 +30,8 @@ type
      Rebuild3DPos:Boolean ;
      CenterView:TPoint3D ;
      rback,gback,bback:Single ;
+     bhm,bhp:GLfloat ;
+     texp0,texp1:GLfloat ;
      procedure DrawCube(block:TBlock) ;
      procedure DrawPreCube(block:TBlock) ;
      procedure SetCubePos(pos:TPoint3D) ;
@@ -39,6 +41,7 @@ type
      function GetEyePoint():TPoint3D ;
      function GetViewPoint():TPoint3D ;
      function block2point3d(block:TBlock):TPoint3D ;
+     procedure setCubeVarsByBlock(block:TBlock) ;
   public
      NoSelection:Boolean ;
      ShowBorders:Boolean ;
@@ -177,6 +180,23 @@ begin
   PosX:=pos.x ; posY:=pos.y ; PosZ:=pos.z ;
 end;
 
+procedure TRender.setCubeVarsByBlock(block: TBlock);
+begin
+  if block.bt=btFull then begin
+    bhm:=-1.0 ; bhp:=1.0 ;
+    texp0:=0.0 ; texp1:=1.0 ;
+  end
+  else
+  if block.bt=btUpper then begin
+    bhm:=0.0 ; bhp:=1.0 ;
+    texp0:=0.5 ; texp1:=1.0 ;
+  end
+  else begin
+    bhm:=-1.0 ; bhp:=0.0 ;
+    texp0:=0.0 ; texp1:=0.5 ;
+  end;
+end;
+
 procedure TRender.SetDefaultCenterView;
 begin
   CenterView.x:=0 ;
@@ -234,36 +254,39 @@ begin
   Result:=(Abs(PosZ+z-TekZ)<EPS)and(Abs(PosY-TekY)<1-EPS)and(Abs(PosX-TekX)<1-EPS) ;
 end;
 
-var POS:array[0..1] of double = (1.0,-1.0) ;
+const POS:array[0..1] of GLfloat = (-1.0,1.0);
 
 procedure TRender.DrawCube(block:TBlock);
 var sel:Boolean ;
     i1,i2:Integer ;
+    POSy:array[0..1] of GLfloat ;
 begin
    sel:=False ;
+
+   setCubeVarsByBlock(block) ;
 
    if UsePlanesBright then glColor3F(0.80,0.80,0.80) ;
 
    sel:=isTekAtSideZ(1.0) ;
+   if sel and (smode=smGreenSide) then glColor3F(0.0,1.0,0.0) ;
    glBegin(GL_QUADS);
     glNormal3f( 0.0, 0.0, 1.0);
-    if sel and (smode=smGreenSide) then glColor3F(0.0,1.0,0.0) ;
-    glTexCoord2f(0.0, 0.0); glVertex3f(-1.0, -1.0,  1.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f( 1.0, -1.0,  1.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f( 1.0,  1.0,  1.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f(-1.0,  1.0,  1.0);
+    glTexCoord2f(0.0, texp0); glVertex3f(-1.0, bhm,  1.0);
+    glTexCoord2f(1.0, texp0); glVertex3f( 1.0, bhm,  1.0);
+    glTexCoord2f(1.0, texp1); glVertex3f( 1.0,  bhp,  1.0);
+    glTexCoord2f(0.0, texp1); glVertex3f(-1.0,  bhp,  1.0);
    glEnd;
    if sel then begin FisBlockOver:=True ; OverBlock:=block; OverBlockDir:=dirZgr ;
       glColor3F(1.0,1.0,1.0) ; Inc(Rcnt) ; end ;
 
    sel:=isTekAtSideZ(-1.0) ;
+   if sel and (smode=smGreenSide) then glColor3F(0.0,1.0,0.0) ;
    glBegin(GL_QUADS);
     glNormal3f( 0.0, 0.0,-1.0);
-    if sel and (smode=smGreenSide) then glColor3F(0.0,1.0,0.0) ;
-    glTexCoord2f(1.0, 0.0); glVertex3f(-1.0, -1.0, -1.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f(-1.0,  1.0, -1.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f( 1.0,  1.0, -1.0);
-    glTexCoord2f(0.0, 0.0); glVertex3f( 1.0, -1.0, -1.0);
+    glTexCoord2f(1.0, texp0); glVertex3f(-1.0, bhm, -1.0);
+    glTexCoord2f(1.0, texp1); glVertex3f(-1.0,  bhp, -1.0);
+    glTexCoord2f(0.0, texp1); glVertex3f( 1.0,  bhp, -1.0);
+    glTexCoord2f(0.0, texp0); glVertex3f( 1.0, bhm, -1.0);
    glEnd;
    if sel then begin FisBlockOver:=True ; OverBlock:=block; OverBlockDir:=dirZle ;
       glColor3F(1.0,1.0,1.0) ; Inc(Rcnt) ; end ;
@@ -271,25 +294,25 @@ begin
    if UsePlanesBright then glColor3F(1.0,1.0,1.0) ;
 
    sel:=isTekAtSideY(1.0)  ;
+   if sel and (smode=smGreenSide) then glColor3F(0.0,1.0,0.0) ;
    glBegin(GL_QUADS);
     glNormal3f( 0.0, 1.0, 0.0);
-    if sel and (smode=smGreenSide) then glColor3F(0.0,1.0,0.0) ;
-    glTexCoord2f(0.0, 1.0); glVertex3f(-1.0,  1.0, -1.0);
-    glTexCoord2f(0.0, 0.0); glVertex3f(-1.0,  1.0,  1.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f( 1.0,  1.0,  1.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f( 1.0,  1.0, -1.0);
+    glTexCoord2f(0.0, 1.0); glVertex3f(-1.0,  bhp, -1.0);
+    glTexCoord2f(0.0, 0.0); glVertex3f(-1.0,  bhp,  1.0);
+    glTexCoord2f(1.0, 0.0); glVertex3f( 1.0,  bhp,  1.0);
+    glTexCoord2f(1.0, 1.0); glVertex3f( 1.0,  bhp, -1.0);
    glEnd();
    if sel then begin FisBlockOver:=True ; OverBlock:=block; OverBlockDir:=dirYgr ;
       glColor3F(1.0,1.0,1.0) ; Inc(Rcnt) ; end ;
 
    sel:=isTekAtSideY(-1.0) ;
+   if sel and (smode=smGreenSide) then glColor3F(0.0,1.0,0.0) ;
    glBegin(GL_QUADS);
     glNormal3f( 0.0,-1.0, 0.0);
-    if sel and (smode=smGreenSide) then glColor3F(0.0,1.0,0.0) ;
-    glTexCoord2f(1.0, 1.0); glVertex3f(-1.0, -1.0, -1.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f( 1.0, -1.0, -1.0);
-    glTexCoord2f(0.0, 0.0); glVertex3f( 1.0, -1.0,  1.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f(-1.0, -1.0,  1.0);
+    glTexCoord2f(1.0, 1.0); glVertex3f(-1.0, bhm, -1.0);
+    glTexCoord2f(0.0, 1.0); glVertex3f( 1.0, bhm, -1.0);
+    glTexCoord2f(0.0, 0.0); glVertex3f( 1.0, bhm,  1.0);
+    glTexCoord2f(1.0, 0.0); glVertex3f(-1.0, bhm,  1.0);
    glEnd();
    if sel then begin FisBlockOver:=True ; OverBlock:=block; OverBlockDir:=dirYle;
       glColor3F(1.0,1.0,1.0) ; Inc(Rcnt) ; end ;
@@ -297,13 +320,13 @@ begin
    if UsePlanesBright then glColor3F(0.6,0.6,0.6) ;
 
    sel:=isTekAtSideX(1.0) ;
+   if sel and (smode=smGreenSide) then glColor3F(0.0,1.0,0.0) ;
    glBegin(GL_QUADS);
     glNormal3f( 1.0, 0.0, 0.0);
-    if sel and (smode=smGreenSide) then glColor3F(0.0,1.0,0.0) ;
-    glTexCoord2f(1.0, 0.0); glVertex3f( 1.0, -1.0, -1.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f( 1.0,  1.0, -1.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f( 1.0,  1.0,  1.0);
-    glTexCoord2f(0.0, 0.0); glVertex3f( 1.0, -1.0,  1.0);
+    glTexCoord2f(1.0, texp0); glVertex3f( 1.0, bhm, -1.0);
+    glTexCoord2f(1.0, texp1); glVertex3f( 1.0,  bhp, -1.0);
+    glTexCoord2f(0.0, texp1); glVertex3f( 1.0,  bhp,  1.0);
+    glTexCoord2f(0.0, texp0); glVertex3f( 1.0, bhm,  1.0);
    glEnd();
    if sel then begin FisBlockOver:=True ; OverBlock:=block; OverBlockDir:=dirXgr ;
       glColor3F(1.0,1.0,1.0) ; Inc(Rcnt) ; end ;
@@ -312,30 +335,31 @@ begin
    if sel and (smode=smGreenSide) then glColor3F(0.0,1.0,0.0) ;
    glBegin(GL_QUADS);
     glNormal3f(-1.0, 0.0, 0.0);
-    glTexCoord2f(0.0, 0.0); glVertex3f(-1.0, -1.0, -1.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f(-1.0, -1.0,  1.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f(-1.0,  1.0,  1.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f(-1.0,  1.0, -1.0);
+    glTexCoord2f(0.0, texp0); glVertex3f(-1.0, bhm, -1.0);
+    glTexCoord2f(1.0, texp0); glVertex3f(-1.0, bhm,  1.0);
+    glTexCoord2f(1.0, texp1); glVertex3f(-1.0,  bhp,  1.0);
+    glTexCoord2f(0.0, texp1); glVertex3f(-1.0,  bhp, -1.0);
   glEnd();
    if sel then begin FisBlockOver:=True ; OverBlock:=block; OverBlockDir:=dirXle ;
       glColor3F(1.0,1.0,1.0) ; Inc(Rcnt) ; end ;
 
    if ShowBorders then begin
+   POSy[0]:=bhm ; POSy[1]:=bhp ;
    glColor3d(rback,gback,bback);
    glLineWidth(2.0);
    for i1 := 0 to 1 do
      for i2 := 0 to 1 do begin
        glBegin(GL_LINES);
-       glVertex3f(-1.0, POS[i1],  POS[i2]);
-       glVertex3f( 1.0, POS[i1],  POS[i2]);
+       glVertex3f(-1.0, POSy[i1],  POS[i2]);
+       glVertex3f( 1.0, POSy[i1],  POS[i2]);
        glEnd();
        glBegin(GL_LINES);
-       glVertex3f(POS[i1], -1.0, POS[i2]);
-       glVertex3f(POS[i1], 1.0, POS[i2]);
+       glVertex3f(POS[i1], bhm, POS[i2]);
+       glVertex3f(POS[i1], bhp, POS[i2]);
        glEnd();
        glBegin(GL_LINES);
-       glVertex3f(POS[i1], POS[i2], -1.0);
-       glVertex3f(POS[i1], POS[i2], 1.0);
+       glVertex3f(POS[i1], POSy[i2], -1.0);
+       glVertex3f(POS[i1], POSy[i2], 1.0);
        glEnd();
      end;
    glColor3d(1.0,1.0,1.0);
@@ -345,54 +369,55 @@ end;
 
 procedure TRender.DrawPreCube(block:TBlock);
 begin
+   setCubeVarsByBlock(block) ;
+
    glBegin(GL_QUADS);
     glNormal3f( 0.0, 0.0, 1.0);
-    glTexCoord2f(0.0, 0.0); glVertex3f(-1.0, -1.0,  1.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f( 1.0, -1.0,  1.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f( 1.0,  1.0,  1.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f(-1.0,  1.0,  1.0);
+    glTexCoord2f(0.0, texp0); glVertex3f(-1.0, bhm,  1.0);
+    glTexCoord2f(1.0, texp0); glVertex3f( 1.0, bhm,  1.0);
+    glTexCoord2f(1.0, texp1); glVertex3f( 1.0,  bhp,  1.0);
+    glTexCoord2f(0.0, texp1); glVertex3f(-1.0,  bhp,  1.0);
    glEnd;
 
    glBegin(GL_QUADS);
     glNormal3f( 0.0, 0.0,-1.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f(-1.0, -1.0, -1.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f(-1.0,  1.0, -1.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f( 1.0,  1.0, -1.0);
-    glTexCoord2f(0.0, 0.0); glVertex3f( 1.0, -1.0, -1.0);
+    glTexCoord2f(1.0, texp0); glVertex3f(-1.0, bhm, -1.0);
+    glTexCoord2f(1.0, texp1); glVertex3f(-1.0,  bhp, -1.0);
+    glTexCoord2f(0.0, texp1); glVertex3f( 1.0,  bhp, -1.0);
+    glTexCoord2f(0.0, texp0); glVertex3f( 1.0, bhm, -1.0);
    glEnd;
 
    glBegin(GL_QUADS);
     glNormal3f( 0.0, 1.0, 0.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f(-1.0,  1.0, -1.0);
-    glTexCoord2f(0.0, 0.0); glVertex3f(-1.0,  1.0,  1.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f( 1.0,  1.0,  1.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f( 1.0,  1.0, -1.0);
+    glTexCoord2f(0.0, 1.0); glVertex3f(-1.0,  bhp, -1.0);
+    glTexCoord2f(0.0, 0.0); glVertex3f(-1.0,  bhp,  1.0);
+    glTexCoord2f(1.0, 0.0); glVertex3f( 1.0,  bhp,  1.0);
+    glTexCoord2f(1.0, 1.0); glVertex3f( 1.0,  bhp, -1.0);
    glEnd();
 
    glBegin(GL_QUADS);
     glNormal3f( 0.0,-1.0, 0.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f(-1.0, -1.0, -1.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f( 1.0, -1.0, -1.0);
-    glTexCoord2f(0.0, 0.0); glVertex3f( 1.0, -1.0,  1.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f(-1.0, -1.0,  1.0);
+    glTexCoord2f(1.0, 1.0); glVertex3f(-1.0, bhm, -1.0);
+    glTexCoord2f(0.0, 1.0); glVertex3f( 1.0, bhm, -1.0);
+    glTexCoord2f(0.0, 0.0); glVertex3f( 1.0, bhm,  1.0);
+    glTexCoord2f(1.0, 0.0); glVertex3f(-1.0, bhm,  1.0);
    glEnd();
 
    glBegin(GL_QUADS);
     glNormal3f( 1.0, 0.0, 0.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f( 1.0, -1.0, -1.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f( 1.0,  1.0, -1.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f( 1.0,  1.0,  1.0);
-    glTexCoord2f(0.0, 0.0); glVertex3f( 1.0, -1.0,  1.0);
+    glTexCoord2f(1.0, texp0); glVertex3f( 1.0, bhm, -1.0);
+    glTexCoord2f(1.0, texp1); glVertex3f( 1.0,  bhp, -1.0);
+    glTexCoord2f(0.0, texp1); glVertex3f( 1.0,  bhp,  1.0);
+    glTexCoord2f(0.0, texp0); glVertex3f( 1.0, bhm,  1.0);
    glEnd();
 
    glBegin(GL_QUADS);
     glNormal3f(-1.0, 0.0, 0.0);
-    glTexCoord2f(0.0, 0.0); glVertex3f(-1.0, -1.0, -1.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f(-1.0, -1.0,  1.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f(-1.0,  1.0,  1.0);
-    glTexCoord2f(0.0, 1.0); glVertex3f(-1.0,  1.0, -1.0);
-  glEnd();
-
+    glTexCoord2f(0.0, texp0); glVertex3f(-1.0, bhm, -1.0);
+    glTexCoord2f(1.0, texp0); glVertex3f(-1.0, bhm,  1.0);
+    glTexCoord2f(1.0, texp1); glVertex3f(-1.0,  bhp,  1.0);
+    glTexCoord2f(0.0, texp1); glVertex3f(-1.0,  bhp, -1.0);
+   glEnd();
 end;
 
 

@@ -22,12 +22,14 @@ type
 
   TMovingMode = (mmDecart, mmSphere) ;
   TSelectionMode = (smPreview, smGreenSide) ;
+  TBlockType = (btFull,btUpper,btLower) ;
 
   TBlock = record
     x:Integer ;
     y:Integer ;
     z:Integer ;
     texcode:string ;
+    bt:TBlockType ;
     gid:string ;
   end;
 

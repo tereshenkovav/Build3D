@@ -65,7 +65,7 @@ begin
 
   dic.Clear() ;
   for b in self do
-    if mm.getCountBlocksAround6(b)=6 then begin
+    if mm.getCountFullBlocksAround6(b)=6 then begin
       if not dic.ContainsKey(b.gid) then dic.Add(b.gid,True) ;
     end;
 

@@ -23,7 +23,7 @@ begin
   inherited Apply(model,block,dir) ;
   x:=block.x ; y:=block.y ; z:=block.z ;
   updateXYZByDir(dir,x,y,z) ;
-  model.AddBlock(x,y,z,tmpTexName) ;
+  model.AddTypedBlock(x,y,z,tmpTexName,tmpBlockType) ;
   model.RebuildSkippedBlocks() ;
 end;
 
@@ -47,7 +47,7 @@ begin
   x:=block.x ; y:=block.y ; z:=block.z ;
   updateXYZByDir(dir,x,y,z) ;
 
-  Result.Add(TModel.newBlock(x,y,z,tmpTexName)) ;
+  Result.Add(TModel.newBlock(x,y,z,tmpTexName,tmpBlockType)) ;
 end;
 
 initialization

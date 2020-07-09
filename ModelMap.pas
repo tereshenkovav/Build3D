@@ -16,9 +16,12 @@ type
     constructor Create(list:TList<TBlock>) ;
     destructor Destroy ; override ;
     function isBlockAt(x,y,z:Integer):Boolean ;
+    function isFullBlockAt(x,y,z:Integer):Boolean ;
     function getBlockAt(x,y,z:Integer; out block:TBlock):Boolean ;
     function getCountBlocksAround6(b:TBlock):Integer ; overload ;
     function getCountBlocksAround6(x,y,z:Integer):Integer ; overload ;
+    function getCountFullBlocksAround6(b:TBlock):Integer ; overload ;
+    function getCountFullBlocksAround6(x,y,z:Integer):Integer ; overload ;
     function getCountBlocksAround26(x,y,z:Integer): Integer;
   end;
 
@@ -80,6 +83,14 @@ begin
   Result:=cube[x-xs,y-ys,z-zs]>=0 ;
 end;
 
+function TModelMap.isFullBlockAt(x,y,z:Integer):Boolean ;
+begin
+  if isBlockAt(x,y,z) then
+    Result:=blocks[cube[x-xs,y-ys,z-zs]].bt=btFull
+  else
+    Result:=False ;
+end;
+
 function TModelMap.getBlockAt(x,y,z:Integer; out block:TBlock):Boolean ;
 begin
   if isempty then Exit(False) ;
@@ -112,9 +123,25 @@ begin
   if isBlockAt(x,y,z+1) then Inc(Result) ;
 end;
 
+function TModelMap.getCountFullBlocksAround6(x,y,z:Integer): Integer;
+begin
+  Result:=0 ;
+  if isFullBlockAt(x-1,y,z) then Inc(Result) ;
+  if isFullBlockAt(x+1,y,z) then Inc(Result) ;
+  if isFullBlockAt(x,y-1,z) then Inc(Result) ;
+  if isFullBlockAt(x,y+1,z) then Inc(Result) ;
+  if isFullBlockAt(x,y,z-1) then Inc(Result) ;
+  if isFullBlockAt(x,y,z+1) then Inc(Result) ;
+end;
+
 function TModelMap.getCountBlocksAround6(b: TBlock): Integer;
 begin
   Result:=getCountBlocksAround6(b.x,b.y,b.z) ;
+end;
+
+function TModelMap.getCountFullBlocksAround6(b: TBlock): Integer;
+begin
+  Result:=getCountFullBlocksAround6(b.x,b.y,b.z) ;
 end;
 
 end.

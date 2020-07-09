@@ -58,6 +58,9 @@ type
     NShowBorder: TMenuItem;
     NBridght: TMenuItem;
     NRedo: TMenuItem;
+    rbFullBlock: TRadioButton;
+    rbUpper: TRadioButton;
+    rbLower: TRadioButton;
     procedure NExitClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -124,7 +127,7 @@ implementation
 uses OpenGL, IOUtils,
   dglOpenGL,
   DrawToolCubeCube,DrawToolPar,DrawToolSphere, DrawToolSmooth,DrawToolGrow,
-    UnitSizeLimit,
+    UnitSizeLimit, DrawToolCube,
     UnitSliceOpt, Constants, DrawToolPip, CommonProc, Monitor, Measure,
     ModelExport ;
 
@@ -603,6 +606,10 @@ begin
   EdParX.Visible:=(ActiveTool is TDrawToolPar) ;
   EdParY.Visible:=(ActiveTool is TDrawToolPar) ;
   EdParZ.Visible:=(ActiveTool is TDrawToolPar) ;
+
+  rbFullBlock.Visible:=(ActiveTool is TDrawToolCube) ;
+  rbUpper.Visible:=(ActiveTool is TDrawToolCube) ;
+  rbLower.Visible:=(ActiveTool is TDrawToolCube) ;
 end;
 
 procedure TFormMain.UpdateToolParams(tool:TDrawTool=nil);
@@ -617,6 +624,9 @@ begin
   Tool.tmpParX:=StrToInt(Trim(EdParX.Text)) ;
   Tool.tmpParY:=StrToInt(Trim(EdParY.Text)) ;
   Tool.tmpParZ:=StrToInt(Trim(EdParZ.Text)) ;
+  if rbFullBlock.Checked then Tool.tmpBlockType:=btFull ;
+  if rbUpper.Checked then Tool.tmpBlockType:=btUpper ;
+  if rbLower.Checked then Tool.tmpBlockType:=btLower ;
   except
   end;
 end;

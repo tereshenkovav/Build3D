@@ -2,7 +2,7 @@ object FormMain: TFormMain
   Left = 0
   Top = 0
   Caption = #1058#1088#1077#1093#1084#1077#1088#1085#1099#1081' '#1088#1077#1076#1072#1082#1090#1086#1088' '#1082#1091#1073#1080#1082#1086#1074
-  ClientHeight = 647
+  ClientHeight = 715
   ClientWidth = 666
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -26,9 +26,10 @@ object FormMain: TFormMain
     Left = 488
     Top = 0
     Width = 178
-    Height = 647
+    Height = 715
     Align = alRight
     TabOrder = 0
+    ExplicitHeight = 671
     object Label1: TLabel
       Left = 16
       Top = 8
@@ -121,11 +122,12 @@ object FormMain: TFormMain
     end
     object Panel1: TPanel
       Left = 1
-      Top = 509
+      Top = 577
       Width = 176
       Height = 137
       Align = alBottom
       TabOrder = 5
+      ExplicitTop = 533
       object stModelSize: TStaticText
         Left = 5
         Top = 8
@@ -172,12 +174,38 @@ object FormMain: TFormMain
       TabOrder = 6
       OnChange = ComboTexsInModelChange
     end
+    object rbFullBlock: TRadioButton
+      Left = 6
+      Top = 507
+      Width = 91
+      Height = 17
+      Caption = #1055#1086#1083#1085#1099#1081' '#1073#1083#1086#1082
+      Checked = True
+      TabOrder = 7
+      TabStop = True
+    end
+    object rbUpper: TRadioButton
+      Left = 6
+      Top = 530
+      Width = 113
+      Height = 17
+      Caption = #1042#1077#1088#1093#1085#1080#1081' '#1087#1086#1083#1091#1073#1083#1086#1082
+      TabOrder = 8
+    end
+    object rbLower: TRadioButton
+      Left = 6
+      Top = 553
+      Width = 113
+      Height = 17
+      Caption = #1053#1080#1078#1085#1080#1081' '#1087#1086#1083#1091#1073#1083#1086#1082
+      TabOrder = 9
+    end
   end
   object PanelGL: TPanel
     Left = 0
     Top = 0
     Width = 488
-    Height = 647
+    Height = 715
     Align = alClient
     DoubleBuffered = True
     ParentDoubleBuffered = False
@@ -185,6 +213,7 @@ object FormMain: TFormMain
     OnClick = PanelGLClick
     OnMouseMove = PanelGLMouseMove
     OnMouseUp = PanelGLMouseUp
+    ExplicitHeight = 671
   end
   object MainMenu1: TMainMenu
     OwnerDraw = True

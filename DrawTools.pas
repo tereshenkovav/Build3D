@@ -16,6 +16,7 @@ type
     tmpParX:Integer ;
     tmpParY:Integer ;
     tmpParZ:Integer ;
+    tmpBlockType:TBlockType ;
     function Caption():string ; virtual ; abstract ;
     function Order():Integer ; virtual ; abstract ;
     function Apply(model:TModel; block:TBlock; dir:TBlockDir):Boolean ; virtual ;
