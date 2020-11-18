@@ -15,7 +15,7 @@ type
   end;
 
 implementation
-uses Generics.Collections, Classes, Types, Graphics, Jpeg, pngimage,SysUtils,
+uses Generics.Collections, Classes, Types, Graphics, Jpeg, StrUtils, pngimage,SysUtils,
   CommonProc, Constants, BlockListHelper ;
 
 function TModelExport.findVisibleBlock(x, y, z: Integer; out block: TBlock): Boolean;
@@ -109,18 +109,26 @@ begin
     bmp.Canvas.Brush.Color:=clBlack ;
     bmp.Canvas.FillRect(Rect(0,0,w,h));
     bmp.Canvas.Pen.Color:=clGreen ;
-    bmp.Canvas.Brush.Color:=clGreen ;
+    bmp.Canvas.Brush.Color:=clBlack ;
     bmp.Canvas.Pen.Width:=3 ;
+    bmp.Canvas.Font.Size:=16 ;
+    bmp.Canvas.Font.Color:=clWhite ;
     i:=y2-y1 ;
     for y := y1 to y2 do begin
       j:=0 ;
       for z := z1 to z2 do begin
         blockrect:=Rect(j*SIZE,i*SIZE,j*SIZE+SIZE-1,i*SIZE+SIZE-1) ;
         if showpriorlayer then
-          if findVisibleBlock(p-1,y,z,b) then
+          if findVisibleBlock(p-1,y,z,b) then begin
             bmp.Canvas.StretchDraw(blockrect,getCachedTexGray(b.texcode,layerbr));
-        if findVisibleBlock(p,y,z,b) then
+            if b.bt<>btFull then
+              bmp.Canvas.TextOut(blockrect.Left,blockrect.Top,IfThen(b.bt=btUpper,'U','L'));
+          end ;
+        if findVisibleBlock(p,y,z,b) then begin
           bmp.Canvas.StretchDraw(blockrect,getCachedTex(b.texcode));
+          if b.bt<>btFull then
+            bmp.Canvas.TextOut(blockrect.Left,blockrect.Top,IfThen(b.bt=btUpper,'U','L'));
+        end ;
         Inc(j) ;
       end;
       Dec(i) ;
