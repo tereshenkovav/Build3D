@@ -124,12 +124,12 @@ var
   FormMain: TFormMain;
 
 implementation
-uses OpenGL, IOUtils, RegularExpressions,
+uses OpenGL, IOUtils,
   dglOpenGL,
   DrawToolCubeCube,DrawToolPar,DrawToolSphere, DrawToolSmooth,DrawToolGrow,
     UnitSizeLimit, DrawToolCube, DrawToolSel,
     UnitSliceOpt, Constants, DrawToolPip, CommonProc, Monitor, Measure,
-    ModelExport ;
+    ModelExport, CopyParser ;
 
 {$R *.dfm}
 
@@ -252,8 +252,7 @@ var strafe:Boolean ;
    block:TBlock ;
    dir:TBlockDir ;
    str:string ;
-   r:TRegEx ;
-   matches:TMatchCollection ;
+   parser:TCopyParser ;
 begin
   strafe:=False ;//ssShift in Shift ;
 
@@ -305,16 +304,15 @@ begin
       Exit ;
     end ;
 
-    if not InputQuery('Копирование','Введите сдвиг копирования (x y z)',str) then Exit ;
+    if not InputQuery('Копирование','Введите сдвиг копирования (x y z) и установку отражений',str) then Exit ;
 
-    r:=TRegEx.Create('([+-]?\d+)\x20+([+-]?\d+)\x20+([+-]?\d+)');
-    matches := r.Matches(str.Trim());
-    if matches.Count<>1 then
+    parser:=TCopyParser.Create(str) ;
+    if not parser.isCommandOk() then
       ShowMessage('Неверный ввод координат сдвига')
     else begin
-      model.CopyZoneTo(render.getZoneSelection(),StrToInt(Matches[0].Groups[1].Value),
-        StrToInt(Matches[0].Groups[2].Value),
-        StrToInt(Matches[0].Groups[3].Value)) ;
+      model.CopyZoneTo(render.getZoneSelection(),
+        parser.getTarget(),
+        parser.getMirrors()) ;
       render.EmitRebuild3D() ;
     end ;
   end;

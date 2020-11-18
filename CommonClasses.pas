@@ -35,10 +35,14 @@ type
     y2:Integer ;
     z2:Integer ;
     function isBlockIn(const b:TBlock):Boolean ;
+    function dX():Integer ;
+    function dY():Integer ;
+    function dZ():Integer ;
   end;
 
   TBlockDir = ( dirXle,dirXgr,dirYle,dirYgr,dirZle,dirZgr ) ;
   TAxis = ( axisX, axisY, axisZ ) ;
+  TAxisSet = set of TAxis ;
 
   TLoadResult = (lrOk, lrError, lrUnknownTextures) ;
 
@@ -61,6 +65,21 @@ begin
 end;
 
 { TZone3I }
+
+function TZone3I.dX: Integer;
+begin
+  Result:=x2-x1+1 ;
+end;
+
+function TZone3I.dY: Integer;
+begin
+  Result:=y2-y1+1 ;
+end;
+
+function TZone3I.dZ: Integer;
+begin
+  Result:=z2-z1+1 ;
+end;
 
 function TZone3I.isBlockIn(const b: TBlock): Boolean;
 begin

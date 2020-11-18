@@ -25,7 +25,8 @@ uses
   DrawToolSmooth in 'DrawToolSmooth.pas',
   DrawToolGrow in 'DrawToolGrow.pas',
   ModelExport in 'ModelExport.pas',
-  DrawToolSel in 'DrawToolSel.pas';
+  DrawToolSel in 'DrawToolSel.pas',
+  CopyParser in 'CopyParser.pas';
 
 {$R *.res}
 
