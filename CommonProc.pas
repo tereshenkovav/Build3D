@@ -13,6 +13,7 @@ function AppPath():string ;
 function getX(b:TBlock):Integer ;
 function getY(b:TBlock):Integer ;
 function getZ(b:TBlock):Integer ;
+function isValueBetween(x,a,b:Integer):Boolean ;
 
 implementation
 
@@ -72,5 +73,10 @@ begin  Result:=b.y ; end;
 
 function getZ(b:TBlock):Integer ;
 begin  Result:=b.z ; end;
+
+function isValueBetween(x,a,b:Integer):Boolean ;
+begin
+  Result:=((a<=x)and(x<=b)) or ((b<=x)and(x<=a)) ;
+end;
 
 end.

@@ -36,6 +36,7 @@ type
      procedure RebuildSkippedBlocks() ;
      function isBlockSkiped(const b:TBlock):Boolean ;
      procedure fillUsedTextures(texcodes:TStrings) ;
+     procedure CopyZoneTo(const zone:TZone3I; dx,dy,dz:Integer) ;
   end;
 
 procedure UpdateXYZByDir(dir:TBlockDir; var x:Integer; var y:Integer; var z:Integer) ;
@@ -43,7 +44,7 @@ procedure UpdateXYZByDir(dir:TBlockDir; var x:Integer; var y:Integer; var z:Inte
 implementation
 uses SysUtils, Types,
   OmniXML,
-  BlockListHelper, Constants, CommonProc, Measure, DebugClient ;
+  BlockListHelper, Constants, CommonProc, Measure, DebugClient, ModelMap ;
 
 procedure UpdateXYZByDir(dir:TBlockDir; var x:Integer; var y:Integer; var z:Integer) ;
 begin
@@ -91,6 +92,18 @@ end;
 procedure TModel.Clear;
 begin
   blocks.Clear() ;
+end;
+
+procedure TModel.CopyZoneTo(const zone: TZone3I; dx, dy, dz: Integer);
+var b:TBlock ;
+begin
+  PushBlocks() ;
+
+  for b in blocks do
+    if zone.isBlockIn(b) then
+      AddTypedBlock(b.x+dx,b.y+dy,b.z+dz,b.texcode,b.bt,True) ;
+
+  RebuildSkippedBlocks() ;
 end;
 
 constructor TModel.Create;

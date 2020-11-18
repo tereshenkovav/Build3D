@@ -29,7 +29,6 @@ object FormMain: TFormMain
     Height = 715
     Align = alRight
     TabOrder = 0
-    ExplicitHeight = 671
     object Label1: TLabel
       Left = 16
       Top = 8
@@ -127,7 +126,6 @@ object FormMain: TFormMain
       Height = 137
       Align = alBottom
       TabOrder = 5
-      ExplicitTop = 533
       object stModelSize: TStaticText
         Left = 5
         Top = 8
@@ -213,7 +211,6 @@ object FormMain: TFormMain
     OnClick = PanelGLClick
     OnMouseMove = PanelGLMouseMove
     OnMouseUp = PanelGLMouseUp
-    ExplicitHeight = 671
   end
   object MainMenu1: TMainMenu
     OwnerDraw = True

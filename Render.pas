@@ -32,6 +32,9 @@ type
      rback,gback,bback:Single ;
      bhm,bhp:GLfloat ;
      texp0,texp1:GLfloat ;
+     selectionstate:TSelectionState ;
+     FirstSelection:TPoint3I ;
+     LastSelection:TPoint3I ;
      procedure DrawCube(block:TBlock) ;
      procedure DrawPreCube(block:TBlock) ;
      procedure SetCubePos(pos:TPoint3D) ;
@@ -42,6 +45,7 @@ type
      function GetViewPoint():TPoint3D ;
      function block2point3d(block:TBlock):TPoint3D ;
      procedure setCubeVarsByBlock(block:TBlock) ;
+     function isBlockInSelection(const b:TBlock):Boolean ;
   public
      NoSelection:Boolean ;
      ShowBorders:Boolean ;
@@ -68,10 +72,14 @@ type
      procedure EmitRebuild3D() ;
      procedure SetCenterView(block:TBlock) ;
      procedure SetDefaultCenterView() ;
+     procedure doSelect(const b:TBlock) ;
+     procedure resetSelect() ;
+     function getZoneSelection():TZone3I;
+     function isZoneSelection():Boolean ;
   end;
 
 implementation
-uses IOUtils, SysUtils,
+uses IOUtils, SysUtils, Math,
   Textures,
   CommonProc, Monitor ;
 
@@ -102,6 +110,25 @@ begin
   Eye.z:=20.0*sin(teta)*sin(fi) ;
 
   NoSelection:=False ;
+  selectionstate:=stNone ;
+end;
+
+procedure TRender.doSelect(const b: TBlock);
+begin
+  if selectionstate=stNone then begin
+    selectionstate:=stFirstBlock ;
+    firstselection.setFromBlock(b) ;
+  end
+  else
+  if selectionstate=stFirstBlock then begin
+    selectionstate:=stLastBlock ;
+    lastselection.setFromBlock(b) ;
+  end
+  else
+  if selectionstate=stLastBlock then begin
+    selectionstate:=stFirstBlock ;
+    firstselection.setFromBlock(b) ;
+  end ;
 end;
 
 procedure TRender.Get3DPos( WindowX, WindowY: Integer; var ReturnX, ReturnY, ReturnZ: GLDouble );
@@ -120,6 +147,29 @@ begin
   //ReturnX:=0 ;
   //ReturnY:=0 ;
   //ReturnZ:=0 ;
+end;
+
+function TRender.getZoneSelection():TZone3I;
+begin
+  case selectionstate of
+    stNone: begin
+      Result.x1:=0 ; Result.y1:=0 ; Result.z1:=0 ;
+      Result.x2:=-1 ; Result.y2:=-1 ; Result.z2:=-1 ;
+    end;
+    stFirstBlock: begin
+      Result.x1:=FirstSelection.x ; Result.y1:=FirstSelection.y ; Result.z1:=FirstSelection.z ;
+      Result.x1:=FirstSelection.x ; Result.y1:=FirstSelection.y ; Result.z1:=FirstSelection.z ;
+    end ;
+    stLastBlock: begin
+      Result.x1:=Min(FirstSelection.x,LastSelection.x) ;
+      Result.x2:=Max(FirstSelection.x,LastSelection.x) ;
+      Result.y1:=Min(FirstSelection.y,LastSelection.y) ;
+      Result.y2:=Max(FirstSelection.y,LastSelection.y) ;
+      Result.z1:=Min(FirstSelection.z,LastSelection.z) ;
+      Result.z2:=Max(FirstSelection.z,LastSelection.z) ;
+    end ;
+  end;
+
 end;
 
 function TRender.getMovingMode: TMovingMode;
@@ -230,6 +280,20 @@ end;
 
 const EPS = 0.1 ;
 
+function TRender.isBlockInSelection(const b: TBlock): Boolean;
+begin
+  case selectionstate of
+    stNone: Result:=False ;
+    stFirstBlock: Result:=(b.x=FirstSelection.x)and
+      (b.y=FirstSelection.y)and(b.z=FirstSelection.z) ;
+    stLastBlock: Result:=isValueBetween(b.x,FirstSelection.x,LastSelection.x)and
+      isValueBetween(b.y,FirstSelection.y,LastSelection.y)and
+      isValueBetween(b.z,FirstSelection.z,LastSelection.z) ;
+    else
+      Result:=False ;
+  end;
+end;
+
 function TRender.isBlockOver(out block:TBlock; out dir: TBlockDir): Boolean;
 begin
   Result:=FisBlockOver ;
@@ -254,6 +318,11 @@ begin
   Result:=(Abs(PosZ+z-TekZ)<EPS)and(Abs(PosY-TekY)<1-EPS)and(Abs(PosX-TekX)<1-EPS) ;
 end;
 
+function TRender.isZoneSelection: Boolean;
+begin
+  Result:=selectionstate<>stNone ;
+end;
+
 const POS:array[0..1] of GLfloat = (-1.0,1.0);
 
 procedure TRender.DrawCube(block:TBlock);
@@ -265,7 +334,11 @@ begin
 
    setCubeVarsByBlock(block) ;
 
+   glColor4F(1.0,1.0,1.0,1.0) ;
+
    if UsePlanesBright then glColor3F(0.80,0.80,0.80) ;
+
+   if isBlockInSelection(block) then glColor3F(0.0,0.0,1.0) ;
 
    sel:=isTekAtSideZ(1.0) ;
    if sel and (smode=smGreenSide) then glColor3F(0.0,1.0,0.0) ;
@@ -564,6 +637,11 @@ begin
     end;
 
   SwapBuffers(dc);
+end;
+
+procedure TRender.resetSelect;
+begin
+  selectionstate:=stNone ;
 end;
 
 end.

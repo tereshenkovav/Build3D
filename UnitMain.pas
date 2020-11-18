@@ -124,10 +124,10 @@ var
   FormMain: TFormMain;
 
 implementation
-uses OpenGL, IOUtils,
+uses OpenGL, IOUtils, RegularExpressions,
   dglOpenGL,
   DrawToolCubeCube,DrawToolPar,DrawToolSphere, DrawToolSmooth,DrawToolGrow,
-    UnitSizeLimit, DrawToolCube,
+    UnitSizeLimit, DrawToolCube, DrawToolSel,
     UnitSliceOpt, Constants, DrawToolPip, CommonProc, Monitor, Measure,
     ModelExport ;
 
@@ -251,6 +251,9 @@ procedure TFormMain.FormKeyDown(Sender: TObject; var Key: Word;
 var strafe:Boolean ;
    block:TBlock ;
    dir:TBlockDir ;
+   str:string ;
+   r:TRegEx ;
+   matches:TMatchCollection ;
 begin
   strafe:=False ;//ssShift in Shift ;
 
@@ -291,6 +294,29 @@ begin
       render.StrafeHorz(0.25)
     else
       render.MoveByFi(0.1);
+  end;
+
+  if Key=VK_Escape then render.resetSelect() ;
+
+  if (ssCtrl in Shift)and((Key=VK_INSERT)or(Key=ord('V'))) then begin
+
+    if not render.isZoneSelection() then begin
+      ShowMessage('Не выделены блоки') ;
+      Exit ;
+    end ;
+
+    if not InputQuery('Копирование','Введите сдвиг копирования (x y z)',str) then Exit ;
+
+    r:=TRegEx.Create('([+-]?\d+)\x20+([+-]?\d+)\x20+([+-]?\d+)');
+    matches := r.Matches(str.Trim());
+    if matches.Count<>1 then
+      ShowMessage('Неверный ввод координат сдвига')
+    else begin
+      model.CopyZoneTo(render.getZoneSelection(),StrToInt(Matches[0].Groups[1].Value),
+        StrToInt(Matches[0].Groups[2].Value),
+        StrToInt(Matches[0].Groups[3].Value)) ;
+      render.EmitRebuild3D() ;
+    end ;
   end;
 
   Caption:='Трехмерный редактор кубиков: '+render.GetPosInfo() ;
@@ -555,6 +581,9 @@ begin
   if render.isBlockOver(block,dir) then begin
      if ActiveTool is TDrawToolPip then
        comboTexs.ItemIndex:=comboTexs.Items.IndexOf(block.texcode)
+     else
+     if ActiveTool is TDrawToolSel then
+       render.doSelect(block)
      else
        apply:=True ;
   end

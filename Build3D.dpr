@@ -24,7 +24,8 @@ uses
   DebugClient in 'DebugClient.pas',
   DrawToolSmooth in 'DrawToolSmooth.pas',
   DrawToolGrow in 'DrawToolGrow.pas',
-  ModelExport in 'ModelExport.pas';
+  ModelExport in 'ModelExport.pas',
+  DrawToolSel in 'DrawToolSel.pas';
 
 {$R *.res}
 
