@@ -569,7 +569,7 @@ end;
 procedure TRender.Render(width,height:Integer);
 const
   NearClipping = 0.1;    //Ближняя плоскость отсечения
-  FarClipping  = 200;  //Дальняя плоскость отсечения
+  FarClipping  = 10000;  //Дальняя плоскость отсечения
 var
   x,y,z: Integer;
   block:TBlock ;
