@@ -215,7 +215,8 @@ begin
   comboTexs.ItemIndex:=0 ;
 
   // Отладочный код
-  LoadModel('defaults/demo.model') ;
+  if TFile.Exists('defaults/demo.model') then
+    LoadModel('defaults/demo.model') ;
 
   ActiveFileName:='' ;
 
