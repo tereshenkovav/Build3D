@@ -61,6 +61,7 @@ type
     rbFullBlock: TRadioButton;
     rbUpper: TRadioButton;
     rbLower: TRadioButton;
+    cbSetToEdge: TCheckBox;
     procedure NExitClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -648,6 +649,8 @@ begin
   EdParY.Visible:=(ActiveTool is TDrawToolPar) ;
   EdParZ.Visible:=(ActiveTool is TDrawToolPar) ;
 
+  cbSetToEdge.Visible:=(ActiveTool is TDrawToolSphere) ;
+
   rbFullBlock.Visible:=(ActiveTool is TDrawToolCube) ;
   rbUpper.Visible:=(ActiveTool is TDrawToolCube) ;
   rbLower.Visible:=(ActiveTool is TDrawToolCube) ;
@@ -665,6 +668,7 @@ begin
   Tool.tmpParX:=StrToInt(Trim(EdParX.Text)) ;
   Tool.tmpParY:=StrToInt(Trim(EdParY.Text)) ;
   Tool.tmpParZ:=StrToInt(Trim(EdParZ.Text)) ;
+  Tool.tmpSetToEdge:=cbSetToEdge.Checked ;
   if rbFullBlock.Checked then Tool.tmpBlockType:=btFull ;
   if rbUpper.Checked then Tool.tmpBlockType:=btUpper ;
   if rbLower.Checked then Tool.tmpBlockType:=btLower ;

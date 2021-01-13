@@ -36,7 +36,10 @@ begin
   inherited Apply(model,block,dir) ;
 
   x:=block.x ; y:=block.y ; z:=block.z ;
-  updateXYZByDir(dir,x,y,z) ;
+  if tmpSetToEdge then
+    updateXYZByDir(dir,x,y,z,tmpCubeSize)
+  else
+    updateXYZByDir(dir,x,y,z) ;
 
   fordel:=TList<TBlock>.Create() ;
 
@@ -81,7 +84,10 @@ begin
   Result:=inherited PregetNewBlocks(block,dir) ;
 
   x:=block.x ; y:=block.y ; z:=block.z ;
-  updateXYZByDir(dir,x,y,z) ;
+  if tmpSetToEdge then
+    updateXYZByDir(dir,x,y,z,tmpCubeSize)
+  else
+    updateXYZByDir(dir,x,y,z) ;
 
   list:=TList<TBlock>.Create() ;
 

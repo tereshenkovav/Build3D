@@ -29,6 +29,7 @@ object FormMain: TFormMain
     Height = 715
     Align = alRight
     TabOrder = 0
+    ExplicitLeft = 494
     object Label1: TLabel
       Left = 16
       Top = 8
@@ -197,6 +198,15 @@ object FormMain: TFormMain
       Height = 17
       Caption = #1053#1080#1078#1085#1080#1081' '#1087#1086#1083#1091#1073#1083#1086#1082
       TabOrder = 9
+    end
+    object cbSetToEdge: TCheckBox
+      Left = 56
+      Top = 435
+      Width = 113
+      Height = 17
+      Caption = #1059#1089#1090#1072#1085#1086#1074#1082#1072' '#1082#1088#1072#1077#1084
+      TabOrder = 10
+      Visible = False
     end
   end
   object PanelGL: TPanel

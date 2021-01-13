@@ -40,22 +40,24 @@ type
      procedure ClearZone(const zone: TZone3I);
   end;
 
-procedure UpdateXYZByDir(dir:TBlockDir; var x:Integer; var y:Integer; var z:Integer) ;
+procedure UpdateXYZByDir(dir:TBlockDir; var x:Integer; var y:Integer; var z:Integer;
+  dist:Integer=1) ;
 
 implementation
 uses SysUtils, Types,
   OmniXML,
   BlockListHelper, Constants, CommonProc, Measure, DebugClient, ModelMap ;
 
-procedure UpdateXYZByDir(dir:TBlockDir; var x:Integer; var y:Integer; var z:Integer) ;
+procedure UpdateXYZByDir(dir:TBlockDir; var x:Integer; var y:Integer; var z:Integer;
+  dist:Integer=1) ;
 begin
   case dir of
-    dirXle: Dec(x) ;
-    dirXgr: Inc(x) ;
-    dirYle: Dec(y) ;
-    dirYgr: Inc(y) ;
-    dirZle: Dec(z) ;
-    dirZgr: Inc(z) ;
+    dirXle: x:=x-dist ;
+    dirXgr: x:=x+dist ;
+    dirYle: y:=y-dist ;
+    dirYgr: y:=y+dist ;
+    dirZle: z:=z-dist ;
+    dirZgr: z:=z+dist ;
   end;
 end ;
 
