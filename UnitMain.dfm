@@ -201,11 +201,20 @@ object FormMain: TFormMain
     end
     object cbSetToEdge: TCheckBox
       Left = 56
-      Top = 435
+      Top = 432
       Width = 113
       Height = 17
       Caption = #1059#1089#1090#1072#1085#1086#1074#1082#1072' '#1082#1088#1072#1077#1084
       TabOrder = 10
+      Visible = False
+    end
+    object cbAutoTexGrow: TCheckBox
+      Left = 56
+      Top = 435
+      Width = 113
+      Height = 17
+      Caption = #1040#1074#1090#1086#1090#1077#1082#1089#1090#1091#1088#1072
+      TabOrder = 11
       Visible = False
     end
   end

@@ -19,6 +19,7 @@ type
     function isFullBlockAt(x,y,z:Integer):Boolean ;
     function getBlockAt(x,y,z:Integer; out block:TBlock):Boolean ;
     function getCountBlocksAround6(b:TBlock):Integer ; overload ;
+    function getMaxTexNameAround6(x,y,z:Integer): string;
     function getCountBlocksAround6(x,y,z:Integer):Integer ; overload ;
     function getCountFullBlocksAround6(b:TBlock):Integer ; overload ;
     function getCountFullBlocksAround6(x,y,z:Integer):Integer ; overload ;
@@ -121,6 +122,39 @@ begin
   if isBlockAt(x,y+1,z) then Inc(Result) ;
   if isBlockAt(x,y,z-1) then Inc(Result) ;
   if isBlockAt(x,y,z+1) then Inc(Result) ;
+end;
+
+function TModelMap.getMaxTexNameAround6(x,y,z:Integer): string;
+var texs:TDictionary<string,integer> ;
+
+procedure IncTex(texcode:string) ;
+begin
+  if texs.ContainsKey(texcode) then
+    texs[texcode]:=texs[texcode]+1
+  else
+    texs.Add(texcode,1);
+end;
+
+var key:string ;
+    max:Integer ;
+begin
+  texs:=TDictionary<string,integer>.Create() ;
+  if isBlockAt(x-1,y,z) then IncTex(blocks[cube[x-xs-1,y-ys,z-zs]].texcode);
+  if isBlockAt(x+1,y,z) then IncTex(blocks[cube[x-xs+1,y-ys,z-zs]].texcode);
+  if isBlockAt(x,y-1,z) then IncTex(blocks[cube[x-xs,y-ys-1,z-zs]].texcode);
+  if isBlockAt(x,y+1,z) then IncTex(blocks[cube[x-xs,y-ys+1,z-zs]].texcode);
+  if isBlockAt(x,y,z-1) then IncTex(blocks[cube[x-xs,y-ys,z-zs-1]].texcode);
+  if isBlockAt(x,y,z+1) then IncTex(blocks[cube[x-xs,y-ys,z-zs+1]].texcode);
+
+  max:=0 ;
+  Result:='' ;
+  for key in texs.Keys do
+    if texs[key]>max then begin
+      Result:=key ;
+      max:=texs[key] ;
+    end ;
+
+  texs.Free ;
 end;
 
 function TModelMap.getCountFullBlocksAround6(x,y,z:Integer): Integer;

@@ -62,6 +62,7 @@ type
     rbUpper: TRadioButton;
     rbLower: TRadioButton;
     cbSetToEdge: TCheckBox;
+    cbAutoTexGrow: TCheckBox;
     procedure NExitClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -650,6 +651,7 @@ begin
   EdParZ.Visible:=(ActiveTool is TDrawToolPar) ;
 
   cbSetToEdge.Visible:=(ActiveTool is TDrawToolSphere) ;
+  cbAutoTexGrow.Visible:=(ActiveTool is TDrawToolGrow) ;
 
   rbFullBlock.Visible:=(ActiveTool is TDrawToolCube) ;
   rbUpper.Visible:=(ActiveTool is TDrawToolCube) ;
@@ -669,6 +671,7 @@ begin
   Tool.tmpParY:=StrToInt(Trim(EdParY.Text)) ;
   Tool.tmpParZ:=StrToInt(Trim(EdParZ.Text)) ;
   Tool.tmpSetToEdge:=cbSetToEdge.Checked ;
+  Tool.tmpAutoTexGrow:=cbAutoTexGrow.Checked ;
   if rbFullBlock.Checked then Tool.tmpBlockType:=btFull ;
   if rbUpper.Checked then Tool.tmpBlockType:=btUpper ;
   if rbLower.Checked then Tool.tmpBlockType:=btLower ;

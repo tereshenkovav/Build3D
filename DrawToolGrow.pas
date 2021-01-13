@@ -12,7 +12,8 @@ type
   end;
 
 implementation
-uses Generics.Collections, ModelMap ;
+uses Generics.Collections, StrUtils,
+     ModelMap ;
 
 { TDrawToolGrow }
 
@@ -35,7 +36,9 @@ begin
       for k :=-tmpCubeSize to tmpCubeSize do
         if not mm.isBlockAt(x+i,y+j,z+k) then
           if mm.getCountBlocksAround6(x+i,y+j,z+k)>0 then
-            model.AddBlock(x+i,y+j,z+k,tmpTexName,True) ;
+            model.AddBlock(x+i,y+j,z+k,
+            IfThen(tmpAutoTexGrow,mm.getMaxTexNameAround6(x+i,y+j,z+k),tmpTexName),
+            True) ;
   mm.Free ;
 
   model.RebuildSkippedBlocks() ;
