@@ -5,7 +5,6 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons,
-
   CommonClasses;
 
 type
@@ -45,7 +44,7 @@ type
   end;
 
 implementation
-uses IOUtils ;
+uses IOUtils, IniFiles, simple_files ;
 
 {$R *.dfm}
 
@@ -58,7 +57,22 @@ begin
 end;
 
 procedure TFormSliceOpt.BitBtn1Click(Sender: TObject);
+var axisstr:string ;
 begin
+  with TIniFile.Create(AppPath+'\config.ini') do begin
+    WriteString('FormSliceOpt','EdDir',EdDir.Text) ;
+    WriteInteger('FormSliceOpt','ComboFormat',ComboFormat.ItemIndex) ;
+    WriteString('FormSliceOpt','EdTpl',EdTpl.Text) ;
+    if rbX.Checked then axisstr:='X' else
+    if rbY.Checked then axisstr:='Y' else axisstr:='Z' ;
+    WriteString('FormSliceOpt','Axis',axisstr) ;
+    WriteBool('FormSliceOpt','cbShowGrid',cbShowGrid.Checked) ;
+    WriteBool('FormSliceOpt','cbPriorLayer',cbPriorLayer.Checked) ;
+    WriteString('FormSliceOpt','EdGridWidth',EdGridWidth.Text) ;
+    WriteString('FormSliceOpt','EdPriorLayerBr',EdPriorLayerBr.Text) ;
+    Free ;
+  end;
+
   ModalResult:=mrOk ;
   Hide() ;
 end;
@@ -86,7 +100,19 @@ end;
 
 procedure TFormSliceOpt.FormCreate(Sender: TObject);
 begin
-  EdDir.Text:=TDirectory.GetCurrentDirectory ;
+  with TIniFile.Create(AppPath+'\config.ini') do begin
+    EdDir.Text:=ReadString('FormSliceOpt','EdDir',TDirectory.GetCurrentDirectory) ;
+    ComboFormat.ItemIndex:=ReadInteger('FormSliceOpt','ComboFormat',0) ;
+    EdTpl.Text:=ReadString('FormSliceOpt','EdTpl','layer_%.3d') ;
+    rbX.Checked:=ReadString('FormSliceOpt','Axis','X')='X' ;
+    rbY.Checked:=ReadString('FormSliceOpt','Axis','X')='Y' ;
+    rbZ.Checked:=ReadString('FormSliceOpt','Axis','X')='Z' ;
+    cbShowGrid.Checked:=ReadBool('FormSliceOpt','cbShowGrid',False) ;
+    cbPriorLayer.Checked:=ReadBool('FormSliceOpt','cbPriorLayer',False) ;
+    EdGridWidth.Text:=ReadString('FormSliceOpt','EdGridWidth','2') ;
+    EdPriorLayerBr.Text:=ReadString('FormSliceOpt','EdPriorLayerBr','50') ;
+    Free ;
+  end;
 end;
 
 function TFormSliceOpt.GridWidth: Integer;

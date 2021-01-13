@@ -530,6 +530,10 @@ begin
       render.SetPreBlocks(list) ;
       list.Free ;
     end;
+  end
+  else begin
+    render.ClearPreBlocks() ;
+    oldblockgid:='' ;
   end;
 
 //  Caption:=IntToStr(X)+' '+IntToStr(y) ;

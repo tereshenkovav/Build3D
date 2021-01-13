@@ -67,6 +67,7 @@ type
      procedure SwitchToSphere() ;
      function getMovingMode():TMovingMode ;
      procedure SetPreBlocks(list:TList<TBlock>) ;
+     procedure ClearPreBlocks() ;
      procedure setSelectionMode(value:TSelectionMode) ;
      property BackColor:TColor read FBackColor write FBackColor ;
      procedure EmitRebuild3D() ;
@@ -266,6 +267,11 @@ procedure TRender.SetPreBlocks(list: TList<TBlock>);
 begin
   preblocks.Clear ;
   preblocks.AddRange(list);
+end;
+
+procedure TRender.ClearPreBlocks();
+begin
+  preblocks.Clear ;
 end;
 
 procedure TRender.SetupGL;
