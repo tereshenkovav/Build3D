@@ -317,6 +317,16 @@ begin
     end ;
   end;
 
+  if (ssCtrl in Shift)and((Key=VK_DELETE)or(Key=ord('X'))) then begin
+    if not render.isZoneSelection() then begin
+      ShowMessage('Не выделены блоки') ;
+      Exit ;
+    end ;
+
+    model.ClearZone(render.getZoneSelection()) ;
+    render.EmitRebuild3D() ;
+  end;
+
   Caption:='Трехмерный редактор кубиков: '+render.GetPosInfo() ;
 //  Refresh() ;
 end;

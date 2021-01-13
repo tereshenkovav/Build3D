@@ -37,6 +37,7 @@ type
      function isBlockSkiped(const b:TBlock):Boolean ;
      procedure fillUsedTextures(texcodes:TStrings) ;
      procedure CopyZoneTo(const zone:TZone3I; dP:TPoint3I; mirrors:TAxisSet) ;
+     procedure ClearZone(const zone: TZone3I);
   end;
 
 procedure UpdateXYZByDir(dir:TBlockDir; var x:Integer; var y:Integer; var z:Integer) ;
@@ -110,6 +111,18 @@ begin
       if AxisZ in mirrors then newz:=dp.z+zone.z2-(b.z-zone.z1) ;
       AddTypedBlock(newx,newy,newz,b.texcode,b.bt,True) ;
     end;
+
+  RebuildSkippedBlocks() ;
+end;
+
+procedure TModel.ClearZone(const zone: TZone3I);
+var i:Integer ;
+begin
+  PushBlocks() ;
+
+  i:=0 ;
+  while i<blocks.Count do
+    if zone.isBlockIn(blocks[i]) then blocks.Delete(i) else Inc(i) ;
 
   RebuildSkippedBlocks() ;
 end;
