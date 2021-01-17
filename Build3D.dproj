@@ -138,6 +138,11 @@
         <DCCReference Include="ModelExport.pas"/>
         <DCCReference Include="DrawToolSel.pas"/>
         <DCCReference Include="CopyParser.pas"/>
+        <DCCReference Include="UnitEditPal.pas">
+            <Form>FormEditPal</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Palette.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

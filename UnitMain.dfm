@@ -29,7 +29,6 @@ object FormMain: TFormMain
     Height = 715
     Align = alRight
     TabOrder = 0
-    ExplicitLeft = 494
     object Label1: TLabel
       Left = 16
       Top = 8
@@ -45,7 +44,7 @@ object FormMain: TFormMain
     end
     object Label2: TLabel
       Left = 6
-      Top = 324
+      Top = 292
       Width = 47
       Height = 13
       Caption = #1058#1077#1082#1089#1090#1091#1088#1072
@@ -67,7 +66,7 @@ object FormMain: TFormMain
     end
     object Label5: TLabel
       Left = 6
-      Top = 370
+      Top = 375
       Width = 98
       Height = 13
       Caption = #1058#1077#1082#1089#1090#1091#1088#1099' '#1074' '#1084#1086#1076#1077#1083#1080
@@ -79,9 +78,16 @@ object FormMain: TFormMain
       Height = 13
       Caption = #1056#1072#1076#1080#1091#1089' '#1087#1088#1080#1084#1077#1085#1077#1085#1080#1103
     end
+    object Label6: TLabel
+      Left = 6
+      Top = 334
+      Width = 103
+      Height = 13
+      Caption = #1058#1077#1082#1089#1090#1091#1088#1099' '#1074' '#1087#1072#1083#1080#1090#1088#1077
+    end
     object comboTexs: TComboBox
       Left = 6
-      Top = 343
+      Top = 311
       Width = 163
       Height = 21
       Style = csDropDownList
@@ -217,6 +223,16 @@ object FormMain: TFormMain
       TabOrder = 11
       Visible = False
     end
+    object ComboPal: TComboBox
+      Left = 6
+      Top = 348
+      Width = 163
+      Height = 21
+      Style = csDropDownList
+      Sorted = True
+      TabOrder = 12
+      OnChange = ComboPalChange
+    end
   end
   object PanelGL: TPanel
     Left = 0
@@ -280,6 +296,25 @@ object FormMain: TFormMain
         OnClick = NBlockReportClick
       end
     end
+    object N6: TMenuItem
+      Caption = #1055#1072#1083#1080#1090#1088#1072
+      object NAddToPal: TMenuItem
+        Caption = #1044#1086#1073#1072#1074#1080#1090#1100' '#1090#1077#1082#1091#1097#1091#1102' '#1074' '#1087#1072#1083#1080#1090#1088#1091
+        OnClick = NAddToPalClick
+      end
+      object NEditPal: TMenuItem
+        Caption = #1055#1088#1072#1074#1082#1072' '#1087#1072#1083#1080#1090#1088#1099
+        OnClick = NEditPalClick
+      end
+      object NSavePalToFile: TMenuItem
+        Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100' '#1074' '#1092#1072#1081#1083
+        OnClick = NSavePalToFileClick
+      end
+      object NLoadPalFromFile: TMenuItem
+        Caption = #1055#1088#1086#1095#1080#1090#1072#1090#1100' '#1080#1079' '#1092#1072#1081#1083#1072
+        OnClick = NLoadPalFromFileClick
+      end
+    end
     object N3: TMenuItem
       Caption = #1059#1089#1090#1072#1085#1086#1074#1082#1080
       object NSetSizeLimit: TMenuItem
@@ -341,6 +376,7 @@ object FormMain: TFormMain
     Top = 408
   end
   object SaveDialog1: TSaveDialog
+    DefaultExt = 'model'
     Filter = #1052#1086#1076#1077#1083#1080' (*.model)|*.model|'#1042#1089#1077' '#1092#1072#1081#1083#1099' (*.*)|*.*'
     FilterIndex = 0
     Left = 232
@@ -355,5 +391,18 @@ object FormMain: TFormMain
     OnTimer = Timer1Timer
     Left = 160
     Top = 320
+  end
+  object SaveDialog2: TSaveDialog
+    DefaultExt = 'pal'
+    Filter = #1055#1072#1083#1080#1090#1088#1099' (*.pal)|*.pal|'#1042#1089#1077' '#1092#1072#1081#1083#1099' (*.*)|*.*'
+    FilterIndex = 0
+    Left = 232
+    Top = 464
+  end
+  object OpenDialog2: TOpenDialog
+    Filter = #1055#1072#1083#1080#1090#1088#1099' (*.pal)|*.pal|'#1042#1089#1077' '#1092#1072#1081#1083#1099' (*.*)|*.*'
+    FilterIndex = 0
+    Left = 136
+    Top = 464
   end
 end

@@ -63,6 +63,15 @@ type
     rbLower: TRadioButton;
     cbSetToEdge: TCheckBox;
     cbAutoTexGrow: TCheckBox;
+    Label6: TLabel;
+    ComboPal: TComboBox;
+    N6: TMenuItem;
+    NAddToPal: TMenuItem;
+    NEditPal: TMenuItem;
+    NSavePalToFile: TMenuItem;
+    NLoadPalFromFile: TMenuItem;
+    SaveDialog2: TSaveDialog;
+    OpenDialog2: TOpenDialog;
     procedure NExitClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -96,6 +105,11 @@ type
     procedure NShowBorderClick(Sender: TObject);
     procedure NBridghtClick(Sender: TObject);
     procedure NRedoClick(Sender: TObject);
+    procedure ComboPalChange(Sender: TObject);
+    procedure NAddToPalClick(Sender: TObject);
+    procedure NEditPalClick(Sender: TObject);
+    procedure NSavePalToFileClick(Sender: TObject);
+    procedure NLoadPalFromFileClick(Sender: TObject);
   private
      dc : HDC; //контекст устройства
      hRC : HGLRC; //контекст рендеринга
@@ -131,9 +145,15 @@ uses OpenGL, IOUtils,
   DrawToolCubeCube,DrawToolPar,DrawToolSphere, DrawToolSmooth,DrawToolGrow,
     UnitSizeLimit, DrawToolCube, DrawToolSel,
     UnitSliceOpt, Constants, DrawToolPip, CommonProc, Monitor, Measure,
-    ModelExport, CopyParser ;
+    ModelExport, CopyParser, UnitEditPal ;
 
 {$R *.dfm}
+
+procedure TFormMain.ComboPalChange(Sender: TObject);
+begin
+  ComboTexs.ItemIndex:=ComboTexs.Items.IndexOf
+    (ComboPal.Items[ComboPal.ItemIndex]) ;
+end;
 
 procedure TFormMain.ComboTexsInModelChange(Sender: TObject);
 begin
@@ -196,7 +216,7 @@ begin
   k:=0 ;
   for tool in TDrawTool.getToolList() do begin
     but:=TButton.Create(panelTool);
-    but.Font.Size:=14 ;
+    but.Font.Size:=12 ;
     but.Left:=10 ;
     but.Width:=panelTool.Width-but.Left*2 ;
     but.Top:=p ;
@@ -206,7 +226,7 @@ begin
     but.Tag:=k ;
     Inc(k) ;
     buts.Add(but) ;
-    Inc(p,but.Height+5) ;
+    Inc(p,but.Height+3) ;
   end;
   buts[0].Click() ;
 
@@ -389,6 +409,13 @@ begin
   ShowMessage('Нажмите F8, когда будет выделен кубик мышкой') ;
 end;
 
+procedure TFormMain.NAddToPalClick(Sender: TObject);
+begin
+  if (comboTexs.ItemIndex<>-1) then
+    if ComboPal.Items.IndexOf(comboTexs.Items[comboTexs.ItemIndex])=-1 then
+      ComboPal.Items.Add(comboTexs.Items[comboTexs.ItemIndex]) ;
+end;
+
 procedure TFormMain.NBlockReportClick(Sender: TObject);
 begin
   ShowMessage(model.buildBlockReport()) ;
@@ -405,6 +432,16 @@ begin
   render.SwitchToDecart() ;
 end;
 
+procedure TFormMain.NEditPalClick(Sender: TObject);
+begin
+  with TFormEditPal.Create(Self) do begin
+    setPal(ComboPal.Items) ;
+    if ShowModal()=mrOK then
+      ComboPal.Items.Assign(getPal());
+    Free ;
+  end;
+end;
+
 procedure TFormMain.NExitClick(Sender: TObject);
 begin
   Close() ;
@@ -413,6 +450,11 @@ end;
 procedure TFormMain.NGreenSideClick(Sender: TObject);
 begin
   render.setSelectionMode(smGreenSide);
+end;
+
+procedure TFormMain.NLoadPalFromFileClick(Sender: TObject);
+begin
+  if OpenDialog2.Execute() then ComboPal.Items.LoadFromFile(OpenDialog2.FileName);
 end;
 
 procedure TFormMain.NNewClick(Sender: TObject);
@@ -460,6 +502,16 @@ begin
     model.SaveToFile(ActiveFileName)
   else
     doSaveDialog() ;
+end;
+
+procedure TFormMain.NSavePalToFileClick(Sender: TObject);
+begin
+  if comboPal.Items.Count=0 then begin
+    ShowMessage('Палитра пуста') ;
+    Exit ;
+  end;
+
+  if SaveDialog2.Execute() then comboPal.Items.SaveToFile(SaveDialog2.FileName);
 end;
 
 procedure TFormMain.NSetBackColorClick(Sender: TObject);

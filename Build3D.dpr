@@ -26,7 +26,9 @@ uses
   DrawToolGrow in 'DrawToolGrow.pas',
   ModelExport in 'ModelExport.pas',
   DrawToolSel in 'DrawToolSel.pas',
-  CopyParser in 'CopyParser.pas';
+  CopyParser in 'CopyParser.pas',
+  UnitEditPal in 'UnitEditPal.pas' {FormEditPal},
+  Palette in 'Palette.pas';
 
 {$R *.res}
 
