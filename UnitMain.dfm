@@ -85,6 +85,13 @@ object FormMain: TFormMain
       Height = 13
       Caption = #1058#1077#1082#1089#1090#1091#1088#1099' '#1074' '#1087#1072#1083#1080#1090#1088#1077
     end
+    object ImageTex: TImage
+      Left = 108
+      Top = 507
+      Width = 64
+      Height = 64
+      Stretch = True
+    end
     object comboTexs: TComboBox
       Left = 6
       Top = 311
@@ -92,6 +99,7 @@ object FormMain: TFormMain
       Height = 21
       Style = csDropDownList
       TabOrder = 0
+      OnChange = comboTexsChange
     end
     object EdCubeN: TEdit
       Left = 8
@@ -192,17 +200,17 @@ object FormMain: TFormMain
     object rbUpper: TRadioButton
       Left = 6
       Top = 530
-      Width = 113
+      Width = 96
       Height = 17
-      Caption = #1042#1077#1088#1093#1085#1080#1081' '#1087#1086#1083#1091#1073#1083#1086#1082
+      Caption = #1042#1077#1088#1093#1085#1103#1103' '#1087#1083#1080#1090#1072
       TabOrder = 8
     end
     object rbLower: TRadioButton
       Left = 6
       Top = 553
-      Width = 113
+      Width = 96
       Height = 17
-      Caption = #1053#1080#1078#1085#1080#1081' '#1087#1086#1083#1091#1073#1083#1086#1082
+      Caption = #1053#1080#1078#1085#1103#1103' '#1087#1083#1080#1090#1072
       TabOrder = 9
     end
     object cbSetToEdge: TCheckBox

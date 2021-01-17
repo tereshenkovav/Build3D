@@ -72,6 +72,7 @@ type
     NLoadPalFromFile: TMenuItem;
     SaveDialog2: TSaveDialog;
     OpenDialog2: TOpenDialog;
+    ImageTex: TImage;
     procedure NExitClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -110,11 +111,13 @@ type
     procedure NEditPalClick(Sender: TObject);
     procedure NSavePalToFileClick(Sender: TObject);
     procedure NLoadPalFromFileClick(Sender: TObject);
+    procedure comboTexsChange(Sender: TObject);
   private
      dc : HDC; //контекст устройства
      hRC : HGLRC; //контекст рендеринга
      render:TRender ;
      texturecodes:TStringList ;
+     textureicons:TDictionary<string,TBitmap> ;
      model:TModel ;
      buts: TList<TButton> ;
      ActiveTool:TDrawTool ;
@@ -132,6 +135,7 @@ type
      procedure MeasureTopLevelItem(Sender: TObject; ACanvas: TCanvas; var Width,
        Height: Integer);
      procedure UpdateCombo() ;
+     procedure setTextureIndex(index:Integer) ;
   public
     { Public declarations }
   end;
@@ -149,16 +153,27 @@ uses OpenGL, IOUtils,
 
 {$R *.dfm}
 
+procedure TFormMain.setTextureIndex(index: Integer);
+begin
+  ComboTexs.ItemIndex:=index ;
+  comboTexsChange(comboTexs) ;
+end;
+
 procedure TFormMain.ComboPalChange(Sender: TObject);
 begin
-  ComboTexs.ItemIndex:=ComboTexs.Items.IndexOf
-    (ComboPal.Items[ComboPal.ItemIndex]) ;
+  setTextureIndex(ComboTexs.Items.IndexOf
+    (ComboPal.Items[ComboPal.ItemIndex])) ;
+end;
+
+procedure TFormMain.comboTexsChange(Sender: TObject);
+begin
+  ImageTex.Picture.Assign(textureicons[ComboTexs.Items[ComboTexs.ItemIndex]]);
 end;
 
 procedure TFormMain.ComboTexsInModelChange(Sender: TObject);
 begin
-  ComboTexs.ItemIndex:=ComboTexs.Items.IndexOf
-    (ComboTexsInModel.Items[ComboTexsInModel.ItemIndex]) ;
+  setTextureIndex(ComboTexs.Items.IndexOf
+    (ComboTexsInModel.Items[ComboTexsInModel.ItemIndex])) ;
 end;
 
 procedure TFormMain.doSaveDialog;
@@ -208,6 +223,7 @@ begin
   ActivateRenderingContext(dc,hrc); //активируем контекст рендеринга
   render.SetupGL();
   texturecodes:=render.LoadRes(TEXDIR) ;
+  textureicons:=render.LoadTexIcons(TEXDIR,64,64) ;
   //установка режимов OpenGL
   Application.OnIdle := IdleHandler;
 
@@ -232,7 +248,7 @@ begin
 
   for texcode in texturecodes do
     comboTexs.Items.Add(texcode);
-  comboTexs.ItemIndex:=0 ;
+  setTextureIndex(0) ;
 
   // Отладочный код
   if TFile.Exists('defaults/demo.model') then
@@ -647,7 +663,7 @@ begin
   apply:=False ;
   if render.isBlockOver(block,dir) then begin
      if ActiveTool is TDrawToolPip then
-       comboTexs.ItemIndex:=comboTexs.Items.IndexOf(block.texcode)
+       setTextureIndex(comboTexs.Items.IndexOf(block.texcode))
      else
      if ActiveTool is TDrawToolSel then
        render.doSelect(block)

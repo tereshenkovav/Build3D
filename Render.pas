@@ -54,6 +54,7 @@ type
      procedure SetupGL;
      function GetPosInfo():string ;
      function LoadRes(Texdir:string):TStringList ;
+     function LoadTexIcons(Texdir:string; w,h:Integer):TDictionary<string,TBitmap>;
      procedure Render(width,height:Integer);
      procedure MoveByR(dr:Double) ;
      procedure MoveByTeta(da:Double) ;
@@ -515,6 +516,26 @@ begin
     texcode:=TPath.GetFileName(filename).ToLower ;
     texs.Add(texcode,Tex);
     Result.Add(texcode) ;
+  end;
+end;
+
+function TRender.LoadTexIcons(Texdir:string; w,h:Integer):TDictionary<string,TBitmap>;
+var filename,texcode:string ;
+    bmp:TBitmap ;
+    picture:TPicture;
+begin
+  Result:=TDictionary<string,TBitmap>.Create() ;
+  for filename in TDirectory.GetFiles(Texdir) do begin
+    texcode:=TPath.GetFileName(filename).ToLower ;
+
+    picture:=TPicture.Create() ;
+    picture.LoadFromFile(filename);
+    bmp:=TBitmap.Create ;
+    bmp.SetSize(w,h);
+    bmp.Canvas.StretchDraw(Rect(0,0,w,h),picture.Graphic);
+    picture.Free ;
+
+    Result.Add(texcode,bmp);
   end;
 end;
 
