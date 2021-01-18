@@ -73,6 +73,7 @@ type
     SaveDialog2: TSaveDialog;
     OpenDialog2: TOpenDialog;
     ImageTex: TImage;
+    NTranspTextures: TMenuItem;
     procedure NExitClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -112,6 +113,7 @@ type
     procedure NSavePalToFileClick(Sender: TObject);
     procedure NLoadPalFromFileClick(Sender: TObject);
     procedure comboTexsChange(Sender: TObject);
+    procedure NTranspTexturesClick(Sender: TObject);
   private
      dc : HDC; //контекст устройства
      hRC : HGLRC; //контекст рендеринга
@@ -144,12 +146,12 @@ var
   FormMain: TFormMain;
 
 implementation
-uses OpenGL, IOUtils,
+uses OpenGL, IOUtils, IniFiles,
   dglOpenGL,
   DrawToolCubeCube,DrawToolPar,DrawToolSphere, DrawToolSmooth,DrawToolGrow,
     UnitSizeLimit, DrawToolCube, DrawToolSel,
     UnitSliceOpt, Constants, DrawToolPip, CommonProc, Monitor, Measure,
-    ModelExport, CopyParser, UnitEditPal ;
+    ModelExport, CopyParser, UnitEditPal, UnitTranspTexs ;
 
 {$R *.dfm}
 
@@ -249,6 +251,11 @@ begin
   for texcode in texturecodes do
     comboTexs.Items.Add(texcode);
   setTextureIndex(0) ;
+
+  with TIniFile.Create(AppPath+'\config.ini') do begin
+    render.setTranspTexs(ReadString('Transparent','Textures','')) ;
+    Free ;
+  end ;
 
   // Отладочный код
   if TFile.Exists('defaults/demo.model') then
@@ -578,6 +585,22 @@ end;
 procedure TFormMain.NSphereClick(Sender: TObject);
 begin
   render.SwitchToSphere() ;
+end;
+
+procedure TFormMain.NTranspTexturesClick(Sender: TObject);
+var ini:TIniFile ;
+begin
+  ini:=TIniFile.Create(AppPath+'\config.ini') ;
+  with TFormTranspTexs.Create(Self) do begin
+    setTexs(ini.ReadString('Transparent','Textures','')) ;
+    if ShowModal()=mrOK then begin
+      ini.WriteString('Transparent','Textures',getTexs());
+      render.setTranspTexs(getTexs());
+      render.EmitRebuild3D() ;
+    end;
+    Free ;
+  end;
+  ini.Free ;
 end;
 
 procedure TFormMain.NUndoClick(Sender: TObject);

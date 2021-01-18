@@ -43,6 +43,7 @@ type
   TBlockDir = ( dirXle,dirXgr,dirYle,dirYgr,dirZle,dirZgr ) ;
   TAxis = ( axisX, axisY, axisZ ) ;
   TAxisSet = set of TAxis ;
+  TBlockDirSet = set of TBlockDir ;
 
   TLoadResult = (lrOk, lrError, lrUnknownTextures) ;
 

@@ -12,6 +12,7 @@ type
      history_head:Integer ;
      limits:TPoint3I ;
      skipped_gids:TDictionary<String,Boolean> ;
+     skipped_planes:TDictionary<String,TBlockDirSet> ;
      function findBlock(x,y,z:Integer; out block:TBlock):Boolean ;
   public
      class function newBlock(x,y,z:Integer; texcode:string; bt:TBlockType=btFull):TBlock ;
@@ -35,6 +36,7 @@ type
      function buildBlockReport():string ;
      procedure RebuildSkippedBlocks() ;
      function isBlockSkiped(const b:TBlock):Boolean ;
+     function isPlaneSkiped(const b:TBlock; dir:TBlockDir):Boolean ;
      procedure fillUsedTextures(texcodes:TStrings) ;
      procedure CopyZoneTo(const zone:TZone3I; dP:TPoint3I; mirrors:TAxisSet) ;
      procedure ClearZone(const zone: TZone3I);
@@ -135,6 +137,7 @@ begin
   history:=TList<TPackedBlocks>.Create() ;
   history_head:=0 ;
   skipped_gids:=TDictionary<String,Boolean>.Create() ;
+  skipped_planes:=TDictionary<String,TBlockDirSet>.Create() ;
   limits.x:=100 ;
   limits.y:=100 ;
   limits.z:=100 ;
@@ -227,7 +230,7 @@ end;
 
 procedure TModel.RebuildSkippedBlocks;
 begin
-  blocks.fillHiddenGIDs(skipped_gids) ;
+  blocks.fillHiddenGIDs(skipped_gids,skipped_planes) ;
 end;
 
 procedure TModel.fillUsedTextures(texcodes: TStrings);
@@ -267,6 +270,14 @@ end;
 function TModel.isBlockSkiped(const b: TBlock): Boolean;
 begin
   Result:=skipped_gids.ContainsKey(b.gid) ;
+end;
+
+function TModel.isPlaneSkiped(const b: TBlock; dir: TBlockDir): Boolean;
+begin
+  if not skipped_planes.ContainsKey(b.gid) then
+    Result:=False
+  else
+    Result:=(dir in skipped_planes[b.gid]) ;
 end;
 
 function TModel.IsEmpty: Boolean;

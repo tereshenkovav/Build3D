@@ -28,7 +28,8 @@ uses
   DrawToolSel in 'DrawToolSel.pas',
   CopyParser in 'CopyParser.pas',
   UnitEditPal in 'UnitEditPal.pas' {FormEditPal},
-  Palette in 'Palette.pas';
+  Palette in 'Palette.pas',
+  UnitTranspTexs in 'UnitTranspTexs.pas' {FormTranspTexs};
 
 {$R *.res}
 

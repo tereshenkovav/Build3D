@@ -14,6 +14,7 @@ function getX(b:TBlock):Integer ;
 function getY(b:TBlock):Integer ;
 function getZ(b:TBlock):Integer ;
 function isValueBetween(x,a,b:Integer):Boolean ;
+function isBlockEqTexAndType(const b1:TBlock; const b2:TBlock):Boolean ;
 
 implementation
 
@@ -77,6 +78,11 @@ begin  Result:=b.z ; end;
 function isValueBetween(x,a,b:Integer):Boolean ;
 begin
   Result:=((a<=x)and(x<=b)) or ((b<=x)and(x<=a)) ;
+end;
+
+function isBlockEqTexAndType(const b1:TBlock; const b2:TBlock):Boolean ;
+begin
+  Result:=(b1.texcode=b2.texcode)and(b1.bt=b2.bt) ;
 end;
 
 end.

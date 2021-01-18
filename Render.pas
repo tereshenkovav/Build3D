@@ -35,6 +35,7 @@ type
      selectionstate:TSelectionState ;
      FirstSelection:TPoint3I ;
      LastSelection:TPoint3I ;
+     transptexs:TStringList ;
      procedure DrawCube(block:TBlock) ;
      procedure DrawPreCube(block:TBlock) ;
      procedure SetCubePos(pos:TPoint3D) ;
@@ -78,6 +79,7 @@ type
      procedure resetSelect() ;
      function getZoneSelection():TZone3I;
      function isZoneSelection():Boolean ;
+     procedure setTranspTexs(texs:string) ;
   end;
 
 implementation
@@ -106,6 +108,7 @@ begin
   FBackColor:=clBlack ;
   Rebuild3DPos:=False ;
   SetDefaultCenterView() ;
+  transptexs:=TStringList.Create ;
 
   Eye.x:=20.0*sin(teta)*cos(fi) ;
   Eye.y:=20.0*cos(teta) ;
@@ -182,6 +185,11 @@ end;
 procedure TRender.setSelectionMode(value: TSelectionMode);
 begin
   smode:=value ;
+end;
+
+procedure TRender.setTranspTexs(texs: string);
+begin
+  transptexs.CommaText:=texs ;
 end;
 
 function TRender.GetEyePoint: TPoint3D;
@@ -336,19 +344,23 @@ procedure TRender.DrawCube(block:TBlock);
 var sel:Boolean ;
     i1,i2:Integer ;
     POSy:array[0..1] of GLfloat ;
+    alpha:GLfloat ;
 begin
    sel:=False ;
 
    setCubeVarsByBlock(block) ;
 
-   glColor4F(1.0,1.0,1.0,1.0) ;
+   if (transptexs.IndexOf(block.texcode)<>-1) then alpha:=0.5 else alpha:=1.0 ;
 
-   if UsePlanesBright then glColor3F(0.80,0.80,0.80) ;
+   glColor4F(1.0,1.0,1.0,alpha) ;
 
-   if isBlockInSelection(block) then glColor3F(0.0,0.0,1.0) ;
+   if UsePlanesBright then glColor4F(0.80,0.80,0.80,alpha) ;
+
+   if isBlockInSelection(block) then glColor4F(0.0,0.0,1.0,1.0) ;
 
    sel:=isTekAtSideZ(1.0) ;
-   if sel and (smode=smGreenSide) then glColor3F(0.0,1.0,0.0) ;
+   if sel and (smode=smGreenSide) then glColor4F(0.0,1.0,0.0,1.0) ;
+   if not model.isPlaneSkiped(block,dirZgr) then begin
    glBegin(GL_QUADS);
     glNormal3f( 0.0, 0.0, 1.0);
     glTexCoord2f(0.0, texp0); glVertex3f(-1.0, bhm,  1.0);
@@ -356,11 +368,13 @@ begin
     glTexCoord2f(1.0, texp1); glVertex3f( 1.0,  bhp,  1.0);
     glTexCoord2f(0.0, texp1); glVertex3f(-1.0,  bhp,  1.0);
    glEnd;
+   end;
    if sel then begin FisBlockOver:=True ; OverBlock:=block; OverBlockDir:=dirZgr ;
-      glColor3F(1.0,1.0,1.0) ; Inc(Rcnt) ; end ;
+      glColor4F(1.0,1.0,1.0,alpha) ; Inc(Rcnt) ; end ;
 
    sel:=isTekAtSideZ(-1.0) ;
-   if sel and (smode=smGreenSide) then glColor3F(0.0,1.0,0.0) ;
+   if sel and (smode=smGreenSide) then glColor4F(0.0,1.0,0.0,1.0) ;
+   if not model.isPlaneSkiped(block,dirZle) then begin
    glBegin(GL_QUADS);
     glNormal3f( 0.0, 0.0,-1.0);
     glTexCoord2f(1.0, texp0); glVertex3f(-1.0, bhm, -1.0);
@@ -368,13 +382,15 @@ begin
     glTexCoord2f(0.0, texp1); glVertex3f( 1.0,  bhp, -1.0);
     glTexCoord2f(0.0, texp0); glVertex3f( 1.0, bhm, -1.0);
    glEnd;
+   end;
    if sel then begin FisBlockOver:=True ; OverBlock:=block; OverBlockDir:=dirZle ;
-      glColor3F(1.0,1.0,1.0) ; Inc(Rcnt) ; end ;
+      glColor4F(1.0,1.0,1.0,alpha) ; Inc(Rcnt) ; end ;
 
-   if UsePlanesBright then glColor3F(1.0,1.0,1.0) ;
+   if UsePlanesBright then glColor4F(1.0,1.0,1.0,alpha) ;
 
    sel:=isTekAtSideY(1.0)  ;
-   if sel and (smode=smGreenSide) then glColor3F(0.0,1.0,0.0) ;
+   if sel and (smode=smGreenSide) then glColor4F(0.0,1.0,0.0,1.0) ;
+   if not model.isPlaneSkiped(block,dirYgr) then begin
    glBegin(GL_QUADS);
     glNormal3f( 0.0, 1.0, 0.0);
     glTexCoord2f(0.0, 1.0); glVertex3f(-1.0,  bhp, -1.0);
@@ -382,11 +398,13 @@ begin
     glTexCoord2f(1.0, 0.0); glVertex3f( 1.0,  bhp,  1.0);
     glTexCoord2f(1.0, 1.0); glVertex3f( 1.0,  bhp, -1.0);
    glEnd();
+   end;
    if sel then begin FisBlockOver:=True ; OverBlock:=block; OverBlockDir:=dirYgr ;
-      glColor3F(1.0,1.0,1.0) ; Inc(Rcnt) ; end ;
+      glColor4F(1.0,1.0,1.0,alpha) ; Inc(Rcnt) ; end ;
 
    sel:=isTekAtSideY(-1.0) ;
-   if sel and (smode=smGreenSide) then glColor3F(0.0,1.0,0.0) ;
+   if sel and (smode=smGreenSide) then glColor4F(0.0,1.0,0.0,1.0) ;
+   if not model.isPlaneSkiped(block,dirYle) then begin
    glBegin(GL_QUADS);
     glNormal3f( 0.0,-1.0, 0.0);
     glTexCoord2f(1.0, 1.0); glVertex3f(-1.0, bhm, -1.0);
@@ -394,13 +412,15 @@ begin
     glTexCoord2f(0.0, 0.0); glVertex3f( 1.0, bhm,  1.0);
     glTexCoord2f(1.0, 0.0); glVertex3f(-1.0, bhm,  1.0);
    glEnd();
+   end;
    if sel then begin FisBlockOver:=True ; OverBlock:=block; OverBlockDir:=dirYle;
-      glColor3F(1.0,1.0,1.0) ; Inc(Rcnt) ; end ;
+      glColor4F(1.0,1.0,1.0,alpha) ; Inc(Rcnt) ; end ;
 
-   if UsePlanesBright then glColor3F(0.6,0.6,0.6) ;
+   if UsePlanesBright then glColor4F(0.6,0.6,0.6,alpha) ;
 
    sel:=isTekAtSideX(1.0) ;
-   if sel and (smode=smGreenSide) then glColor3F(0.0,1.0,0.0) ;
+   if sel and (smode=smGreenSide) then glColor4F(0.0,1.0,0.0,1.0) ;
+   if not model.isPlaneSkiped(block,dirXgr) then begin
    glBegin(GL_QUADS);
     glNormal3f( 1.0, 0.0, 0.0);
     glTexCoord2f(1.0, texp0); glVertex3f( 1.0, bhm, -1.0);
@@ -408,11 +428,13 @@ begin
     glTexCoord2f(0.0, texp1); glVertex3f( 1.0,  bhp,  1.0);
     glTexCoord2f(0.0, texp0); glVertex3f( 1.0, bhm,  1.0);
    glEnd();
+   end;
    if sel then begin FisBlockOver:=True ; OverBlock:=block; OverBlockDir:=dirXgr ;
-      glColor3F(1.0,1.0,1.0) ; Inc(Rcnt) ; end ;
+      glColor4F(1.0,1.0,1.0,alpha) ; Inc(Rcnt) ; end ;
 
    sel:=isTekAtSideX(-1.0) ;
-   if sel and (smode=smGreenSide) then glColor3F(0.0,1.0,0.0) ;
+   if sel and (smode=smGreenSide) then glColor4F(0.0,1.0,0.0,1.0) ;
+   if not model.isPlaneSkiped(block,dirXle) then begin
    glBegin(GL_QUADS);
     glNormal3f(-1.0, 0.0, 0.0);
     glTexCoord2f(0.0, texp0); glVertex3f(-1.0, bhm, -1.0);
@@ -420,8 +442,9 @@ begin
     glTexCoord2f(1.0, texp1); glVertex3f(-1.0,  bhp,  1.0);
     glTexCoord2f(0.0, texp1); glVertex3f(-1.0,  bhp, -1.0);
   glEnd();
+   end;
    if sel then begin FisBlockOver:=True ; OverBlock:=block; OverBlockDir:=dirXle ;
-      glColor3F(1.0,1.0,1.0) ; Inc(Rcnt) ; end ;
+      glColor4F(1.0,1.0,1.0,alpha) ; Inc(Rcnt) ; end ;
 
    if ShowBorders then begin
    POSy[0]:=bhm ; POSy[1]:=bhp ;
@@ -442,7 +465,7 @@ begin
        glVertex3f(POS[i1], POSy[i2], 1.0);
        glEnd();
      end;
-   glColor3d(1.0,1.0,1.0);
+   glColor4f(1.0,1.0,1.0,1.0);
    end;
 
 end;
@@ -604,6 +627,9 @@ begin
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity;
 
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
   glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT);
 
   unRGBOpenGL(BackColor,rback,gback,bback) ;
@@ -648,8 +674,6 @@ begin
 
     if (smode=smPreview) then begin
    glColor4F(1.0,1.0,1.0,0.5) ;
-   glEnable(GL_BLEND);
-   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
    for block in preblocks do begin
       glPushMatrix() ;
       glBindTexture(GL_TEXTURE_2D, Texs[block.texcode]);
@@ -658,10 +682,12 @@ begin
       DrawPreCube(block) ;
       glPopMatrix() ;
     end;
-   glDisable(GL_BLEND);
+
     end;
 
     end;
+
+  glDisable(GL_BLEND);
 
   SwapBuffers(dc);
 end;
