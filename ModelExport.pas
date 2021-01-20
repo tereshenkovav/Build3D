@@ -23,7 +23,7 @@ type
 
 implementation
 uses Classes, Types, Jpeg, StrUtils, pngimage,SysUtils,
-  CommonProc, Constants, BlockListHelper ;
+  CommonProc, Constants, BlockListHelper, Dialogs ;
 
 const
   SIZE=50 ;
@@ -50,26 +50,26 @@ begin
 end;
 
 function TModelExport.getCachedTex(code:string):TGraphic ;
-var tex:TGraphic ;
+var tex:TPicture ;
 begin
   if not texs.ContainsKey(code) then begin
-    tex:=TJpegImage.Create() ;
+    tex:=TPicture.Create() ;
     tex.LoadFromFile(TEXDIR+'\'+code);
-    texs.Add(code,tex);
+    texs.Add(code,tex.Graphic);
   end;
   Result:=texs[code] ;
 end;
 
 function TModelExport.getCachedTexGray(code:string; level:Integer):TGraphic ;
-var tex:TGraphic ;
+var tex:TPicture ;
     bmp:TBitmap ;
     i,j:Integer ;
 begin
   if not texsgray.ContainsKey(code) then begin
-    tex:=TJpegImage.Create() ;
+    tex:=TPicture.Create() ;
     tex.LoadFromFile(TEXDIR+'\'+code);
     bmp:=TBitmap.Create() ;
-    bmp.Assign(tex);
+    bmp.Assign(tex.Graphic);
     tex.Free ;
 
     // gray
