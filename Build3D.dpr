@@ -29,7 +29,9 @@ uses
   CopyParser in 'CopyParser.pas',
   UnitEditPal in 'UnitEditPal.pas' {FormEditPal},
   Palette in 'Palette.pas',
-  UnitTranspTexs in 'UnitTranspTexs.pas' {FormTranspTexs};
+  UnitTranspTexs in 'UnitTranspTexs.pas' {FormTranspTexs},
+  KeysConfig in 'KeysConfig.pas',
+  UnitSetKeys in 'UnitSetKeys.pas' {FormSetKeys};
 
 {$R *.res}
 

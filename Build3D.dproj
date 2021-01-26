@@ -147,6 +147,11 @@
             <Form>FormTranspTexs</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="KeysConfig.pas"/>
+        <DCCReference Include="UnitSetKeys.pas">
+            <Form>FormSetKeys</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

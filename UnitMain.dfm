@@ -345,6 +345,10 @@ object FormMain: TFormMain
         Caption = #1057#1087#1080#1089#1086#1082' '#1087#1088#1086#1079#1088#1072#1095#1085#1099#1093' '#1090#1077#1082#1089#1090#1091#1088
         OnClick = NTranspTexturesClick
       end
+      object NSetKeys: TMenuItem
+        Caption = #1059#1089#1090#1072#1085#1086#1074#1082#1072' '#1082#1083#1072#1074#1080#1096
+        OnClick = NSetKeysClick
+      end
     end
     object N5: TMenuItem
       Caption = #1056#1077#1078#1080#1084#1099

@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Menus,
   Generics.Collections,
-  Render, DrawTools, Model, CommonClasses ;
+  Render, DrawTools, Model, CommonClasses, KeysConfig ;
 
 type
   TFormMain = class(TForm)
@@ -74,6 +74,7 @@ type
     OpenDialog2: TOpenDialog;
     ImageTex: TImage;
     NTranspTextures: TMenuItem;
+    NSetKeys: TMenuItem;
     procedure NExitClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -114,6 +115,7 @@ type
     procedure NLoadPalFromFileClick(Sender: TObject);
     procedure comboTexsChange(Sender: TObject);
     procedure NTranspTexturesClick(Sender: TObject);
+    procedure NSetKeysClick(Sender: TObject);
   private
      dc : HDC; //контекст устройства
      hRC : HGLRC; //контекст рендеринга
@@ -128,6 +130,7 @@ type
      OldCtrlPress:Boolean ;
      oldblockgid:string ;
      olddir:TBlockDir ;
+     keysconfig:TKeysConfig ;
      procedure IdleHandler(Sender : TObject; var Done : Boolean);
      procedure ToolClick(Sender: TObject) ;
      procedure UpdateInfo() ;
@@ -138,6 +141,7 @@ type
        Height: Integer);
      procedure UpdateCombo() ;
      procedure setTextureIndex(index:Integer) ;
+     procedure updateMenuKeys() ;
   public
     { Public declarations }
   end;
@@ -151,7 +155,7 @@ uses OpenGL, IOUtils, IniFiles,
   DrawToolCubeCube,DrawToolPar,DrawToolSphere, DrawToolSmooth,DrawToolGrow,
     UnitSizeLimit, DrawToolCube, DrawToolSel,
     UnitSliceOpt, Constants, DrawToolPip, CommonProc, Monitor, Measure,
-    ModelExport, CopyParser, UnitEditPal, UnitTranspTexs ;
+    ModelExport, CopyParser, UnitEditPal, UnitTranspTexs, UnitSetKeys ;
 
 {$R *.dfm}
 
@@ -273,6 +277,22 @@ begin
   Screen.MenuFont.Size:=16 ;
   setMeasureProc(MainMenu1.Items) ;
 
+  keysconfig:=TKeysConfig.Create ;
+  keysconfig.addKey(KEY_SWITCH_DECART,'Переключение в декартовые координаты',sNo,VK_F6);
+  keysconfig.addKey(KEY_SWITCH_SPHERE,'Переключение в полярные координаты',sNo,VK_F7);
+  keysconfig.addKey(KEY_SET_CENTERVIEW,'Установить центр вращения',sNo,VK_F8);
+  keysconfig.addKey(KEY_GO_NEAR,'Приближение камеры',sNo,VK_W);
+  keysconfig.addKey(KEY_GO_FAR,'Удаление камеры',sNo,VK_S);
+  keysconfig.addKey(KEY_GO_DOWN,'Камера ниже',sNo,VK_Q);
+  keysconfig.addKey(KEY_GO_UP,'Камера выше',sNo,VK_E);
+  keysconfig.addKey(KEY_GO_LEFT,'Камера влево',sNo,VK_A);
+  keysconfig.addKey(KEY_GO_RIGHT,'Камера вправо',sNo,VK_D);
+  keysconfig.addKey(KEY_CANCEL_SELECT,'Сброс выделенного',sNo,VK_ESCAPE);
+  keysconfig.addKey(KEY_COPY_SELECT,'Копия выделенного',sCtrl,VK_INSERT);
+  keysconfig.addKey(KEY_DELETE_SELECT,'Очистка выделенного',sCtrl,VK_DELETE);
+  keysconfig.loadFromFile() ;
+  updateMenuKeys() ;
+
   Timer1.Enabled:=True ;
 
 end;
@@ -285,13 +305,6 @@ begin
   ReleaseDC(PanelGL.Handle,dc);
 end;
 
-const VK_W = 87 ;
-const VK_S = 83 ;
-const VK_A = 65 ;
-const VK_D = 68 ;
-const VK_Q = 81 ;
-const VK_E = 69 ;
-
 procedure TFormMain.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 var strafe:Boolean ;
@@ -302,48 +315,48 @@ var strafe:Boolean ;
 begin
   strafe:=False ;//ssShift in Shift ;
 
-  if Key=VK_F6 then render.SwitchToDecart() ;
-  if Key=VK_F7 then render.SwitchToSphere() ;
-  if Key=VK_F8 then begin
+  if keysconfig.isKeyMatch(KEY_SWITCH_DECART,Shift,Key) then render.SwitchToDecart() ;
+  if keysconfig.isKeyMatch(KEY_SWITCH_SPHERE,Shift,Key) then render.SwitchToSphere() ;
+  if keysconfig.isKeyMatch(KEY_SET_CENTERVIEW,Shift,Key) then begin
      if render.isBlockOver(block,dir) then
        render.SetCenterView(block);
   end;
 
   //Label1.Caption:=IntToStr(Key) ;
-  if Key=VK_W then render.MoveByR(1);
-  if Key=VK_S then render.MoveByR(-1);
+  if keysconfig.isKeyMatch(KEY_GO_NEAR,Shift,Key) then render.MoveByR(1);
+  if keysconfig.isKeyMatch(KEY_GO_FAR,Shift,Key) then render.MoveByR(-1);
 
-  if Key=VK_Q then begin
+  if keysconfig.isKeyMatch(KEY_GO_DOWN,Shift,Key) then begin
     if strafe then
       render.StrafeVert(0.25)
     else
       render.MoveByTeta(+0.1);
   end;
 
-  if Key=VK_E then begin
+  if keysconfig.isKeyMatch(KEY_GO_UP,Shift,Key) then begin
     if strafe then
       render.StrafeVert(-0.25)
     else
       render.MoveByTeta(-0.1);
   end;
 
-  if Key=VK_A then begin
+  if keysconfig.isKeyMatch(KEY_GO_LEFT,Shift,Key) then begin
     if strafe then
       render.StrafeHorz(-0.25)
     else
       render.MoveByFi(-0.1);
   end;
 
-  if Key=VK_D then begin
+  if keysconfig.isKeyMatch(KEY_GO_RIGHT,Shift,Key) then begin
     if strafe then
       render.StrafeHorz(0.25)
     else
       render.MoveByFi(0.1);
   end;
 
-  if Key=VK_Escape then render.resetSelect() ;
+  if keysconfig.isKeyMatch(KEY_CANCEL_SELECT,Shift,Key) then render.resetSelect() ;
 
-  if (ssCtrl in Shift)and((Key=VK_INSERT)or(Key=ord('V'))) then begin
+  if keysconfig.isKeyMatch(KEY_COPY_SELECT,Shift,Key) then begin
 
     if not render.isZoneSelection() then begin
       ShowMessage('Не выделены блоки') ;
@@ -363,7 +376,7 @@ begin
     end ;
   end;
 
-  if (ssCtrl in Shift)and((Key=VK_DELETE)or(Key=ord('X'))) then begin
+  if keysconfig.isKeyMatch(KEY_DELETE_SELECT,Shift,Key) then begin
     if not render.isZoneSelection() then begin
       ShowMessage('Не выделены блоки') ;
       Exit ;
@@ -549,6 +562,18 @@ end;
 procedure TFormMain.NSetDefaultCenterClick(Sender: TObject);
 begin
   render.SetDefaultCenterView() ;
+end;
+
+procedure TFormMain.NSetKeysClick(Sender: TObject);
+begin
+  with TFormSetKeys.Create(Self) do begin
+    setKeysConfig(keysconfig) ;
+    if ShowModal()=mrOk then begin
+      keysconfig.saveToFile() ;
+      updateMenuKeys() ;
+    end;
+    Free ;
+  end;
 end;
 
 procedure TFormMain.NSetSizeLimitClick(Sender: TObject);
@@ -792,6 +817,16 @@ begin
     stModelSize.Caption:=stModelSize.Caption+#13#10' превышен лимит!' ;
     stModelSize.Color:=clRed ;
   end ;
+end;
+
+procedure TFormMain.updateMenuKeys;
+begin
+  NDecart.Caption:='Свободное движение камеры (декартовы координаты) '+
+    keysconfig.getKeyView(KEY_SWITCH_DECART) ;
+  NSphere.Caption:='Вращение камеры вокруг точки (сферические координаты) '+
+    keysconfig.getKeyView(KEY_SWITCH_SPHERE) ;
+  N7.Caption:='Установить новый центр вращения '+
+    keysconfig.getKeyView(KEY_SET_CENTERVIEW) ;
 end;
 
 end.
