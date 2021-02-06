@@ -97,6 +97,11 @@ end;
 procedure TModel.Clear;
 begin
   blocks.Clear() ;
+  history.Clear() ;
+  history_head:=0 ;
+  limits.x:=100 ;
+  limits.y:=100 ;
+  limits.z:=100 ;
 end;
 
 procedure TModel.CopyZoneTo(const zone: TZone3I; dP:TPoint3I; mirrors:TAxisSet);
@@ -333,6 +338,8 @@ var XML: IXMLDocument;
     notfoundlist:TStringList ;
     btstr:string ;
 begin
+  blocks.Clear() ;
+
   Result:=lrOk ;
   errmsg:='' ;
   notfoundlist:=TStringList.Create() ;
