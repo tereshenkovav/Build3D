@@ -44,7 +44,7 @@ type
   end;
 
 implementation
-uses IOUtils, IniFiles, simple_files ;
+uses IOUtils, IniFiles, simple_files, CommonProc ;
 
 {$R *.dfm}
 
@@ -59,7 +59,7 @@ end;
 procedure TFormSliceOpt.BitBtn1Click(Sender: TObject);
 var axisstr:string ;
 begin
-  with TIniFile.Create(AppPath+'\config.ini') do begin
+  with TIniFile.Create(AppDataPath+'\config.ini') do begin
     WriteString('FormSliceOpt','EdDir',EdDir.Text) ;
     WriteInteger('FormSliceOpt','ComboFormat',ComboFormat.ItemIndex) ;
     WriteString('FormSliceOpt','EdTpl',EdTpl.Text) ;
@@ -100,7 +100,7 @@ end;
 
 procedure TFormSliceOpt.FormCreate(Sender: TObject);
 begin
-  with TIniFile.Create(AppPath+'\config.ini') do begin
+  with TIniFile.Create(AppDataPath+'\config.ini') do begin
     EdDir.Text:=ReadString('FormSliceOpt','EdDir',TDirectory.GetCurrentDirectory) ;
     ComboFormat.ItemIndex:=ReadInteger('FormSliceOpt','ComboFormat',0) ;
     EdTpl.Text:=ReadString('FormSliceOpt','EdTpl','layer_%.3d') ;

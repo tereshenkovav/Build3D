@@ -8,7 +8,7 @@ TColor = -$7FFFFFFF-1..$7FFFFFFF;
 
 function getGrayColor(C:TColor; level:Integer):TColor ;
 procedure unRGBOpenGL(C:TColor; var oglR,oglG,oglB:Single) ;
-function AppPath():string ;
+function AppDataPath():string ;
 
 function getX(b:TBlock):Integer ;
 function getY(b:TBlock):Integer ;
@@ -17,17 +17,15 @@ function isValueBetween(x,a,b:Integer):Boolean ;
 function isBlockEqTexAndType(const b1:TBlock; const b2:TBlock):Boolean ;
 
 implementation
+uses SysUtils, IOUtils, simple_files ;
 
-function AppPath():string ;
-var n,Poz,Max:word ;
+function AppDataPath():string ;
 begin
-   Max:=length(ParamStr(0)) ;
-   Poz:=1 ; // На случай, если PathAndFile не содержит путь
-   for n:=1 to Max do
-     if ParamStr(0)[n]='\' then Poz:=n+1 ;
-
-   Result:=copy(ParamStr(0),1,Poz-1) ;
-end ;
+  if Pos('Build3D.exe',ParamStr(0))<>0 then
+    Result:=GetEnvironmentVariable('LOCALAPPDATA')+'\Build3D'
+  else
+    Result:=AppPath() ;
+end;
 
 procedure unRGBOpenGL(C:TColor; var oglR,oglG,oglB:Single) ;
 var r,g,b:byte ;

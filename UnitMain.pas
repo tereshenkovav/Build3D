@@ -212,7 +212,7 @@ end;
 
 begin
 
-  TEXDIR := AppPath()+'\textures' ;
+  TEXDIR := AppDataPath()+'\textures' ;
 
   dc := GetDC(PanelGL.Handle);  //получаем контекст устройства по форме Form1
 
@@ -256,7 +256,7 @@ begin
     comboTexs.Items.Add(texcode);
   setTextureIndex(0) ;
 
-  with TIniFile.Create(AppPath+'\config.ini') do begin
+  with TIniFile.Create(AppDataPath+'\config.ini') do begin
     render.setTranspTexs(ReadString('Transparent','Textures','')) ;
     Free ;
   end ;
@@ -294,7 +294,6 @@ begin
   updateMenuKeys() ;
 
   Timer1.Enabled:=True ;
-
 end;
 
 procedure TFormMain.FormDestroy(Sender: TObject);
@@ -615,7 +614,7 @@ end;
 procedure TFormMain.NTranspTexturesClick(Sender: TObject);
 var ini:TIniFile ;
 begin
-  ini:=TIniFile.Create(AppPath+'\config.ini') ;
+  ini:=TIniFile.Create(AppDataPath+'\config.ini') ;
   with TFormTranspTexs.Create(Self) do begin
     setTexs(ini.ReadString('Transparent','Textures','')) ;
     if ShowModal()=mrOK then begin

@@ -198,7 +198,7 @@ var list:TStringList ;
     sect:string ;
 begin
   list:=TStringList.Create() ;
-  with TIniFile.Create(AppPath+'\keys.ini') do begin
+  with TIniFile.Create(AppDataPath+'\keys.ini') do begin
     ReadSections(list) ;
     for sect in list do
       setKey(sect,
@@ -216,7 +216,7 @@ var code:string ;
 begin
   k:=TCtrlAltShift(0) ;
   w:=Word(k) ;
-  with TIniFile.Create(AppPath+'\keys.ini') do begin
+  with TIniFile.Create(AppDataPath+'\keys.ini') do begin
     for code in keys.Keys do begin
       WriteInteger(code,'Cas',ord(keys[code].cas)) ;
       WriteInteger(code,'Key',keys[code].key) ;
