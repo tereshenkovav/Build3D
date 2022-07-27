@@ -213,6 +213,7 @@ end;
 begin
 
   TEXDIR := AppDataPath()+'\textures' ;
+  if not TDirectory.Exists(TEXDIR) then TDirectory.CreateDirectory(TEXDIR) ;
 
   dc := GetDC(PanelGL.Handle);  //получаем контекст устройства по форме Form1
 
@@ -254,7 +255,10 @@ begin
 
   for texcode in texturecodes do
     comboTexs.Items.Add(texcode);
-  setTextureIndex(0) ;
+  if comboTexs.Items.Count=0 then
+    ShowMessage('Нет ни одного файла в каталоге '+TEXDIR)
+  else
+    setTextureIndex(0) ;
 
   with TIniFile.Create(AppDataPath+'\config.ini') do begin
     render.setTranspTexs(ReadString('Transparent','Textures','')) ;
