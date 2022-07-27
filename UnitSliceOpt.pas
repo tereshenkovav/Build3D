@@ -44,7 +44,7 @@ type
   end;
 
 implementation
-uses IOUtils, IniFiles, simple_files, CommonProc ;
+uses IOUtils, IniFiles, CommonProc ;
 
 {$R *.dfm}
 

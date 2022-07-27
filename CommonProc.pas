@@ -17,14 +17,14 @@ function isValueBetween(x,a,b:Integer):Boolean ;
 function isBlockEqTexAndType(const b1:TBlock; const b2:TBlock):Boolean ;
 
 implementation
-uses SysUtils, IOUtils, simple_files ;
+uses SysUtils, IOUtils ;
 
 function AppDataPath():string ;
 begin
   if Pos('Build3D.exe',ParamStr(0))<>0 then
     Result:=GetEnvironmentVariable('LOCALAPPDATA')+'\Build3D'
   else
-    Result:=AppPath() ;
+    Result:=ExtractFileDir(ParamStr(0)) ;
 end;
 
 procedure unRGBOpenGL(C:TColor; var oglR,oglG,oglB:Single) ;
