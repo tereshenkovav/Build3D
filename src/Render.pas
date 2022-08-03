@@ -356,7 +356,7 @@ begin
 
    if UsePlanesBright then glColor4F(0.80,0.80,0.80,alpha) ;
 
-   if isBlockInSelection(block) then glColor4F(0.0,0.0,1.0,1.0) ;
+   if isBlockInSelection(block) then glColor4F(0.5,0.5,1.0,1.0) ;
 
    sel:=isTekAtSideZ(1.0) ;
    if sel and (smode=smGreenSide) then glColor4F(0.0,1.0,0.0,1.0) ;
