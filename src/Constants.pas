@@ -18,6 +18,7 @@ const
   KEY_GO_RIGHT = 'KEY_GO_RIGHT' ;
   KEY_CANCEL_SELECT = 'KEY_CANCEL_SELECT' ;
   KEY_COPY_SELECT = 'KEY_COPY_SELECT' ;
+  KEY_ROTFILL_SELECT = 'KEY_ROTFILL_SELECT' ;
   KEY_DELETE_SELECT = 'KEY_DELETE_SELECT' ;
 
 const VK_W = 87 ;
@@ -26,6 +27,7 @@ const VK_A = 65 ;
 const VK_D = 68 ;
 const VK_Q = 81 ;
 const VK_E = 69 ;
+const VK_F = 70 ;
 
 var TEXDIR:string ;
 

@@ -293,6 +293,7 @@ begin
   keysconfig.addKey(KEY_GO_RIGHT,'Камера вправо',sNo,VK_D);
   keysconfig.addKey(KEY_CANCEL_SELECT,'Сброс выделенного',sNo,VK_ESCAPE);
   keysconfig.addKey(KEY_COPY_SELECT,'Копия выделенного',sCtrl,VK_INSERT);
+  keysconfig.addKey(KEY_ROTFILL_SELECT,'Заливка вращением выделенного',sCtrl,VK_F);
   keysconfig.addKey(KEY_DELETE_SELECT,'Очистка выделенного',sCtrl,VK_DELETE);
   keysconfig.loadFromFile() ;
   updateMenuKeys() ;
@@ -315,6 +316,7 @@ var strafe:Boolean ;
    dir:TBlockDir ;
    str:string ;
    parser:TCopyParser ;
+   zone:TZone3I ;
 begin
   strafe:=False ;//ssShift in Shift ;
 
@@ -377,6 +379,28 @@ begin
         parser.getMirrors()) ;
       render.EmitRebuild3D() ;
     end ;
+  end;
+
+  if keysconfig.isKeyMatch(KEY_ROTFILL_SELECT,Shift,Key) then begin
+
+    if not render.isZoneSelection() then begin
+      ShowMessage('Не выделены блоки') ;
+      Exit ;
+    end ;
+
+    zone:=render.getZoneSelection() ;
+    if not isZoneReadyForRotFill(zone) then begin
+      ShowMessage('Некорректная зона для заливки вращением - нужна толщина 1 блок') ;
+      Exit ;
+    end ;
+
+    str:='0' ;
+    if not InputQuery('Заливка вращение','Введите ось вращения (0 для оси слева, 1 для оси справа)',str) then Exit ;
+
+    model.RotFillZone(zone,str='0') ;
+    render.resetSelect() ;
+    render.EmitRebuild3D() ;
+
   end;
 
   if keysconfig.isKeyMatch(KEY_DELETE_SELECT,Shift,Key) then begin

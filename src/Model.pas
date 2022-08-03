@@ -39,6 +39,7 @@ type
      function isPlaneSkiped(const b:TBlock; dir:TBlockDir):Boolean ;
      procedure fillUsedTextures(texcodes:TStrings) ;
      procedure CopyZoneTo(const zone:TZone3I; dP:TPoint3I; mirrors:TAxisSet) ;
+     procedure RotFillZone(const zone: TZone3I; switchside:Boolean);
      procedure ClearZone(const zone: TZone3I);
   end;
 
@@ -46,7 +47,7 @@ procedure UpdateXYZByDir(dir:TBlockDir; var x:Integer; var y:Integer; var z:Inte
   dist:Integer=1) ;
 
 implementation
-uses SysUtils, Types,
+uses SysUtils, Types, Math,
   OmniXML,
   BlockListHelper, Constants, CommonProc, Measure, DebugClient, ModelMap ;
 
@@ -120,6 +121,134 @@ begin
       if AxisZ in mirrors then newz:=dp.z+zone.z2-(b.z-zone.z1) ;
       AddTypedBlock(newx,newy,newz,b.texcode,b.bt,True) ;
     end;
+
+  RebuildSkippedBlocks() ;
+end;
+
+procedure TModel.RotFillZone(const zone: TZone3I; switchside:Boolean);
+var p1,p2,p:TPoint3I ;
+    dPx,dPy,dPz:Integer ;
+    dRx,dRy,dRz:Integer ;
+    b,bold:TBlock ;
+    a,da:Single ;
+    newx,newy,newz,r:Integer ;
+    z:Boolean ;
+begin
+  PushBlocks() ;
+
+  if zone.dX()=1 then begin
+    p1.x:=zone.x1 ;
+    p2.x:=zone.x1 ;
+    dRx:=0 ;
+    if zone.dY()>zone.dZ() then begin
+      p1.y:=zone.y1 ;
+      p2.y:=zone.y2 ;
+      p1.z:=IfThen(switchside,zone.z1,zone.z2) ; // switch by monoseq
+      p2.z:=p1.z ;
+      dRy:=0 ;
+      dRz:=IfThen(switchside,1,-1)*Sign(zone.z2-zone.z1) ; // switch by monoseq
+    end
+    else begin
+      p1.y:=IfThen(switchside,zone.y1,zone.y2) ; // switch by monoseq
+      p2.y:=p1.y ;
+      p1.z:=zone.z1 ;
+      p2.z:=zone.z2 ;
+      dRy:=IfThen(switchside,1,-1)*Sign(zone.y2-zone.y1) ; // switch by monoseq
+      dRz:=0 ;
+    end;
+  end;
+
+  if zone.dY()=1 then begin
+    p1.y:=zone.y1 ;
+    p2.y:=zone.y1 ;
+    dRy:=0 ;
+    if zone.dX()>zone.dZ() then begin
+      p1.x:=zone.x1 ;
+      p2.x:=zone.x2 ;
+      p1.z:=IfThen(switchside,zone.z1,zone.z2) ; // switch by monoseq
+      p2.z:=p1.z ;
+      dRx:=0 ;
+      dRz:=IfThen(switchside,1,-1)*Sign(zone.z2-zone.z1) ; // switch by monoseq
+    end
+    else begin
+      p1.x:=IfThen(switchside,zone.x1,zone.x2) ; // switch by monoseq
+      p2.x:=p1.x ;
+      p1.z:=zone.z1 ;
+      p2.z:=zone.z2 ;
+      dRx:=IfThen(switchside,1,-1)*Sign(zone.x2-zone.x1) ; // switch by monoseq
+      dRz:=0 ;
+    end;
+  end;
+
+  if zone.dZ()=1 then begin
+    p1.z:=zone.z1 ;
+    p2.z:=zone.z1 ;
+    dRz:=0 ;
+    if zone.dX()>zone.dY() then begin
+      p1.x:=zone.x1 ;
+      p2.x:=zone.x2 ;
+      p1.y:=IfThen(switchside,zone.y1,zone.y2) ; // switch by monoseq
+      p2.y:=p1.y ;
+      dRx:=0 ;
+      dRy:=IfThen(switchside,1,-1)*Sign(zone.y2-zone.y1) ; // switch by monoseq
+    end
+    else begin
+      p1.x:=IfThen(switchside,zone.x1,zone.x2) ; ; // switch by monoseq
+      p2.x:=p1.x ;
+      p1.y:=zone.y1 ;
+      p2.y:=zone.y2 ;
+      dRx:=IfThen(switchside,1,-1)*Sign(zone.x2-zone.x1) ; // switch by monoseq
+      dRy:=0 ;
+    end;
+  end;
+
+  dPx:=Sign(p2.x-p1.x) ;
+  dPy:=Sign(p2.y-p1.y) ;
+  dPz:=Sign(p2.z-p1.z) ;
+
+  while zone.isPointIn(p1) do begin
+
+    p.x:=p1.x+dRx ;
+    p.y:=p1.y+dRy ;
+    p.z:=p1.z+dRz ;
+
+    while zone.isPointIn(p) do begin
+      if findBlock(p.x,p.y,p.z,b) then begin
+        a:=0 ;
+        r:=Ceil(Sqrt((p.x-p1.x)*(p.x-p1.x)+(p.y-p1.y)*(p.y-p1.y)+(p.z-p1.z)*(p.z-p1.z))) ;
+        da:=0.1/r ;
+        while (a<2*PI) do begin
+          if dPx<>0 then begin
+            newx:=p1.x ;
+            newy:=p1.y+Round(r*Sin(a)) ;
+            newz:=p1.z+Round(r*Cos(a)) ;
+          end;
+          if dPy<>0 then begin
+            newx:=p1.x+Round(r*Sin(a)) ;
+            newy:=p1.y ;
+            newz:=p1.z+Round(r*Cos(a)) ;
+          end;
+          if dPz<>0 then begin
+            newx:=p1.x+Round(r*Sin(a)) ;
+            newy:=p1.y+Round(r*Cos(a)) ;
+            newz:=p1.z ;
+          end;
+          z:=False ;
+          if not findBlock(newx,newy,newz,bold) then z:=True else
+            z:=(b.texcode<>bold.texcode)or(b.bt<>bold.bt) ;
+          if z then AddTypedBlock(newx,newy,newz,b.texcode,b.bt) ;
+          a:=a+da ;
+        end ;
+      end;
+      Inc(p.x,dRx) ;
+      Inc(p.y,dRy) ;
+      Inc(p.z,dRz) ;
+    end;
+
+    Inc(p1.x,dPx) ;
+    Inc(p1.y,dPy) ;
+    Inc(p1.x,dPz) ;
+  end ;
 
   RebuildSkippedBlocks() ;
 end;

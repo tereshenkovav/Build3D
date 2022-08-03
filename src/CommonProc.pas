@@ -15,6 +15,7 @@ function getY(b:TBlock):Integer ;
 function getZ(b:TBlock):Integer ;
 function isValueBetween(x,a,b:Integer):Boolean ;
 function isBlockEqTexAndType(const b1:TBlock; const b2:TBlock):Boolean ;
+function isZoneReadyForFillRot(const zone:TZone3I):Boolean ;
 
 implementation
 uses SysUtils, IOUtils ;
@@ -81,6 +82,14 @@ end;
 function isBlockEqTexAndType(const b1:TBlock; const b2:TBlock):Boolean ;
 begin
   Result:=(b1.texcode=b2.texcode)and(b1.bt=b2.bt) ;
+end;
+
+function isZoneReadyForFillRot(const zone:TZone3I):Boolean ;
+begin
+  Result:=False ;
+  if (zone.dX()=1)and(zone.dY()>1)and(zone.dZ()>1) then Exit(True) ;
+  if (zone.dY()=1)and(zone.dX()>1)and(zone.dZ()>1) then Exit(True) ;
+  if (zone.dZ()=1)and(zone.dX()>1)and(zone.dY()>1) then Exit(True) ;
 end;
 
 end.

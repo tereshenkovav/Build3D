@@ -16,9 +16,9 @@ ReserveFile "runapp.ini"
 
 ; Результирующий файл
 !ifdef updatemode
-OutFile "M:\Build3D-1.0.0.1-Win32-update.exe"
+OutFile "M:\Build3D-1.1.0.2-Win32-update.exe"
 !else
-OutFile "M:\Build3D-1.0.0.1-Win32.exe"
+OutFile "M:\Build3D-1.1.0.2-Win32.exe"
 !endif
 
 var is_update
@@ -118,7 +118,7 @@ Section "Главные компоненты"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Build3D" \
                  "Publisher"  "Терешенков А.В."
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Build3D" \
-                 "DisplayVersion"  "1.0.0.1"
+                 "DisplayVersion"  "1.1.0.2"
 
   ; создание ярлыков
   ;SetOutPath $INSTDIR
